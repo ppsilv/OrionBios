@@ -155,7 +155,7 @@ int fat_open(File *file, const char *path, int flags) {
     priv->fat_file = fat_file;
     priv->mode = fat_mode;
     priv->size = fsize(fat_file);
-    
+   
     file->private_data = priv;
     file->position = 0;
     file->read  = fat_read;

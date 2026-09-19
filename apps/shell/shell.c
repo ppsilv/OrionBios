@@ -506,8 +506,9 @@ void run_boot_script(void) {
 void shell_loop(void) {
     char line[256];
 
-    run_boot_script();
+    //run_boot_script();
 
+    printf("--- Shell do Orion68DOS ---\n");
     vfs_write(1, "--- Shell do Orion68DOS ---\n", 29);
     vfs_write(1, "Digite 'help' para comandos\n\n", 30);
 
@@ -535,12 +536,22 @@ int main(void) {
     #define HEAP_START  0x94000
     #define HEAP_SIZE   (128 * 1024)  // 128KB
     
+    printf("Shell\n");
+
     void *heap_base = (void*)HEAP_START;
     void *heap_limit = (void*)(HEAP_START + HEAP_SIZE);
     size_t max_blocks = 64;
     size_t split_thresh = 16;
     size_t alignment = 4;
-    
+
+    printf("Vou fazer malloc_init\n");
+putchar('P');
+putchar('a');
+putchar('u');
+putchar('l');
+putchar('o');
+putchar('\n');
+
 //    printf("Heap: 0x%x - 0x%x (%d bytes)\n", 
 //           (uint32_t)heap_base, (uint32_t)heap_limit,
 //           (uint32_t)(heap_limit - heap_base));
@@ -552,8 +563,10 @@ int main(void) {
         return -1;
     }
     
+    printf("Vou iniciar vfs_init\n");
 
     vfs_init();
+    printf("Vou chamar o shell\n");
     shell_loop();
     vfs_write(1, "Retornando ao kernel...\n", 25);
     return 0;

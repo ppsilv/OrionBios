@@ -78,8 +78,9 @@ void free_fd(int fd) {
 // vfs.c - vfs_open()
 extern int fat_open(File *file, const char *path, int flags);
 int vfs_open(const char *path, int flags) {
-    
+
     File *file = (File*)malloc(sizeof(File));
+
     if (!file) return -1;
     memset(file, 0, sizeof(File));
     file->name = strdup(path);
@@ -95,13 +96,13 @@ int vfs_open(const char *path, int flags) {
     }
     
     for (int i = 0; drivers[i].path != NULL; i++) {
-        //printf("vfs_open: comparando '%s' com '%s'\n", path, drivers[i].path);
+       // printf("vfs_open: comparando '%s' com '%s'\n", path, drivers[i].path);
         if (strcmp(path, drivers[i].path) == 0) {
-           // printf("vfs_open: ENCONTROU! i=%d\n", i);
+         //   printf("vfs_open: ENCONTROU! i=%d\n", i);
             if (drivers[i].open(file, path, flags) == 0) {
                 int fd = allocate_fd(file);
                 if (fd >= 0) {
-                    //printf("vfs_open: fd=%d (SUCESSO!)\n", fd);
+           //         printf("vfs_open: fd=%d (SUCESSO!)\n", fd);
                     return fd;
                 }
             }
@@ -128,8 +129,12 @@ int vfs_read(int fd, void *buffer, size_t size) {
 // ============================================
 int vfs_write(int fd, const void *buffer, size_t size) {
     File *file = get_file_from_fd(fd);
-    if (!file) return -1;
-    if (file->write) return file->write(file, buffer, size);
+    if (!file) {
+        return -1;
+    }
+    if (file->write) {
+        return file->write(file, buffer, size);
+    }
     return -1;
 }
 
@@ -183,21 +188,23 @@ size_t vfs_lseek(int fd, size_t offset, int whence) {
 void vfs_init(void) {
     memset(fd_table, 0, sizeof(fd_table));
     fd_count = 0;
-    
+
     int fd0 = vfs_open("/dev/tty", O_RDWR);
     int fd1 = vfs_open("/dev/tty", O_RDWR);
     int fd2 = vfs_open("/dev/tty", O_RDWR);
-    
+
     if (fd0 != 0) {
         fd_table[0] = fd_table[fd0];
         fd_table[fd0] = NULL;
         fd_count--;
     }
+
     if (fd1 != 1) {
         fd_table[1] = fd_table[fd1];
         fd_table[fd1] = NULL;
         fd_count--;
     }
+
     if (fd2 != 2) {
         fd_table[2] = fd_table[fd2];
         fd_table[fd2] = NULL;

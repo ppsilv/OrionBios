@@ -209,6 +209,18 @@ go_ahead:
         MOVE.B  #'8',WR_CHAR
 
 
+        move.l  #TrapCHandler, -(%SP)     | handler_addr = TrapCHandler (empilhado 1o, e' o ultimo parametro)
+        move.l  #0x000800fc, -(%SP)      | stub_addr = 0x000800fc (empilhado 2o, e' o 1o parametro)
+        BSR     sys_setramvector           | Chama a função C
+        ADDA.L  #8, %SP                  | 2 argumentos * 4 bytes = 8 (o comentario diz "3 argumentos", mas a conta certa e' 2)
+
+        move.l  #5,%D1
+        BSR     delay_seconds
+        MOVE.B  #'8',WR_CHAR
+
+
+
+
 
         lea     interrupt_status,%a0
         jsr     print_string
