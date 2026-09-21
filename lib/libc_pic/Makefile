@@ -5,7 +5,7 @@ LD = m68k-elf-ld
 OBJCOPY = m68k-elf-objcopy
 
 # Flags
-CFLAGS = -m68000 -fPIC -msep-data -Wall -Os -ffreestanding -nostdlib -I../../include
+CFLAGS = -m68000 -fPIC -msep-data -Wall -O0 -ffreestanding -nostdlib -I../../include
 ARFLAGS = rcs
 
 # Diretórios
@@ -49,7 +49,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.S
 
 # Limpar
 clean:
-	rm -rf $(OBJ_DIR) $(LIB_DIR)/libc68k.a
+	rm -rf $(OBJ_DIR) $(LIB_DIR)/libc68k_pic.a
 
 # Ver conteúdo da biblioteca
 info:

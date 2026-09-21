@@ -1,0 +1,274 @@
+   1               	#NO_APP
+   2               		.file	"tstseek.c"
+   3               		.text
+   4               		.section	.rodata.str1.1,"aMS",@progbits,1
+   5               	.LC0:
+   6 0000 2530 3278 		.string	"%02x "
+   6      2000 
+   7               	.LC1:
+   8 0006 207C 2000 		.string	" | "
+   9               	.LC2:
+  10 000a 2563 00   		.string	"%c"
+  11               	.LC3:
+  12 000d 0A00      		.string	"\n"
+  13               		.text
+  14               		.align	2
+  16               	dump8:
+  17 0000 48E7 2030 		movem.l #8240,-(%sp)
+  18 0004 266F 0010 		move.l 16(%sp),%a3
+  19 0008 7400      		moveq #0,%d2
+  20 000a 45F9 0000 		lea printf,%a2
+  20      0000 
+  21               	.L2:
+  22 0010 7000      		moveq #0,%d0
+  23 0012 1033 2800 		move.b (%a3,%d2.l),%d0
+  24 0016 2F00      		move.l %d0,-(%sp)
+  25 0018 4879 0000 		pea .LC0
+  25      0000 
+  26 001e 4E92      		jsr (%a2)
+  27 0020 5282      		addq.l #1,%d2
+  28 0022 508F      		addq.l #8,%sp
+  29 0024 7008      		moveq #8,%d0
+  30 0026 B082      		cmp.l %d2,%d0
+  31 0028 66E6      		jne .L2
+  32 002a 4879 0000 		pea .LC1
+  32      0000 
+  33 0030 4E92      		jsr (%a2)
+  34 0032 588F      		addq.l #4,%sp
+  35 0034 7400      		moveq #0,%d2
+  36               	.L4:
+  37 0036 1033 2800 		move.b (%a3,%d2.l),%d0
+  38 003a 1200      		move.b %d0,%d1
+  39 003c 0601 FFE0 		add.b #-32,%d1
+  40 0040 0C01 005E 		cmp.b #94,%d1
+  41 0044 6302      		jls .L3
+  42 0046 702E      		moveq #46,%d0
+  43               	.L3:
+  44 0048 0280 0000 		and.l #255,%d0
+  44      00FF 
+  45 004e 2F00      		move.l %d0,-(%sp)
+  46 0050 4879 0000 		pea .LC2
+  46      0000 
+  47 0056 4E92      		jsr (%a2)
+  48 0058 5282      		addq.l #1,%d2
+  49 005a 508F      		addq.l #8,%sp
+  50 005c 7008      		moveq #8,%d0
+  51 005e B082      		cmp.l %d2,%d0
+  52 0060 66D4      		jne .L4
+  53 0062 2F7C 0000 		move.l #.LC3,16(%sp)
+  53      0000 0010 
+  54 006a 4CDF 0C04 		movem.l (%sp)+,#3076
+  55 006e 4EF9 0000 		jra printf
+  55      0000 
+  57               		.section	.rodata.str1.1
+  58               	.LC4:
+  59 000f 7573 6F3A 		.string	"uso: %s arquivo.elf\n"
+  59      2025 7320 
+  59      6172 7175 
+  59      6976 6F2E 
+  59      656C 660A 
+  60               	.LC5:
+  61 0024 6572 726F 		.string	"erro abrindo %s\n"
+  61      2061 6272 
+  61      696E 646F 
+  61      2025 730A 
+  61      00
+  62               	.LC6:
+  63 0035 2D2D 2D20 		.string	"--- 1) off=0 (esperado: 7f 45 4c 46 = magic ELF) ---\n"
+  63      3129 206F 
+  63      6666 3D30 
+  63      2028 6573 
+  63      7065 7261 
+  64               	.LC7:
+  65 006b 666C 7365 		.string	"flseek falhou\n"
+  65      656B 2066 
+  65      616C 686F 
+  65      750A 00
+  66               	.LC8:
+  67 007a 6672 6561 		.string	"fread falhou\n"
+  67      6420 6661 
+  67      6C68 6F75 
+  67      0A00 
+  68               	.LC9:
+  69 0088 6E3D 2575 		.string	"n=%u  "
+  69      2020 00
+  70               	.LC10:
+  71 008f 2D2D 2D20 		.string	"--- 2) off=14968 (comeco da tabela de section headers) ---\n"
+  71      3229 206F 
+  71      6666 3D31 
+  71      3439 3638 
+  71      2028 636F 
+  72               	.LC11:
+  73 00cb 2D2D 2D20 		.string	"--- 3) off=14900, VOLTANDO (comeco da .shstrtab, deve comecar com 0x00 e depois nomes tip
+  73      3329 206F 
+  73      6666 3D31 
+  73      3439 3030 
+  73      2C20 564F 
+  74               	.LC12:
+  75 013c 2D2D 2D20 		.string	"--- 4) off=14968 DE NOVO, pra frente outra vez -- deve ser IDENTICO ao passo 2 ---\n"
+  75      3429 206F 
+  75      6666 3D31 
+  75      3439 3638 
+  75      2044 4520 
+  76               		.section	.text.startup,"ax",@progbits
+  77               		.align	2
+  78               		.globl	main
+  80               	main:
+  81 0000 4FEF FDCC 		lea (-564,%sp),%sp
+  82 0004 48E7 383A 		movem.l #14394,-(%sp)
+  83 0008 246F 0258 		move.l 600(%sp),%a2
+  84 000c 4DF9 0000 		lea printf,%a6
+  84      0000 
+  85 0012 7001      		moveq #1,%d0
+  86 0014 B0AF 0254 		cmp.l 596(%sp),%d0
+  87 0018 6D18      		jlt .L8
+  88 001a 2F12      		move.l (%a2),-(%sp)
+  89 001c 4879 0000 		pea .LC4
+  89      0000 
+  90               	.L17:
+  91 0022 4E96      		jsr (%a6)
+  92 0024 508F      		addq.l #8,%sp
+  93               	.L9:
+  94 0026 7001      		moveq #1,%d0
+  95               	.L7:
+  96 0028 4CDF 5C1C 		movem.l (%sp)+,#23580
+  97 002c 4FEF 0234 		lea (564,%sp),%sp
+  98 0030 4E75      		rts
+  99               	.L8:
+ 100 0032 4878 0001 		pea 1.w
+ 101 0036 2F2A 0004 		move.l 4(%a2),-(%sp)
+ 102 003a 7432      		moveq #50,%d2
+ 103 003c D48F      		add.l %sp,%d2
+ 104 003e 2F02      		move.l %d2,-(%sp)
+ 105 0040 4EB9 0000 		jsr fopen
+ 105      0000 
+ 106 0046 4FEF 000C 		lea (12,%sp),%sp
+ 107 004a 4A80      		tst.l %d0
+ 108 004c 670C      		jeq .L10
+ 109 004e 2F2A 0004 		move.l 4(%a2),-(%sp)
+ 110 0052 4879 0000 		pea .LC5
+ 110      0000 
+ 111 0058 60C8      		jra .L17
+ 112               	.L10:
+ 113 005a 4879 0000 		pea .LC6
+ 113      0000 
+ 114 0060 4E96      		jsr (%a6)
+ 115 0062 42A7      		clr.l -(%sp)
+ 116 0064 2F02      		move.l %d2,-(%sp)
+ 117 0066 47F9 0000 		lea flseek,%a3
+ 117      0000 
+ 118 006c 4E93      		jsr (%a3)
+ 119 006e 4FEF 000C 		lea (12,%sp),%sp
+ 120 0072 4A80      		tst.l %d0
+ 121 0074 670C      		jeq .L12
+ 122               	.L14:
+ 123 0076 4879 0000 		pea .LC7
+ 123      0000 
+ 124               	.L16:
+ 125 007c 4E96      		jsr (%a6)
+ 126 007e 588F      		addq.l #4,%sp
+ 127 0080 60A4      		jra .L9
+ 128               	.L12:
+ 129 0082 781E      		moveq #30,%d4
+ 130 0084 D88F      		add.l %sp,%d4
+ 131 0086 2F04      		move.l %d4,-(%sp)
+ 132 0088 4878 0008 		pea 8.w
+ 133 008c 762A      		moveq #42,%d3
+ 134 008e D68F      		add.l %sp,%d3
+ 135 0090 2F03      		move.l %d3,-(%sp)
+ 136 0092 2F02      		move.l %d2,-(%sp)
+ 137 0094 49F9 0000 		lea fread,%a4
+ 137      0000 
+ 138 009a 4E94      		jsr (%a4)
+ 139 009c 4FEF 0010 		lea (16,%sp),%sp
+ 140 00a0 4A80      		tst.l %d0
+ 141 00a2 6708      		jeq .L13
+ 142               	.L15:
+ 143 00a4 4879 0000 		pea .LC8
+ 143      0000 
+ 144 00aa 60D0      		jra .L16
+ 145               	.L13:
+ 146 00ac 2F2F 001E 		move.l 30(%sp),-(%sp)
+ 147 00b0 4879 0000 		pea .LC9
+ 147      0000 
+ 148 00b6 4E96      		jsr (%a6)
+ 149 00b8 2F03      		move.l %d3,-(%sp)
+ 150 00ba 45F9 0000 		lea dump8,%a2
+ 150      0000 
+ 151 00c0 4E92      		jsr (%a2)
+ 152 00c2 4879 0000 		pea .LC10
+ 152      0000 
+ 153 00c8 4E96      		jsr (%a6)
+ 154 00ca 4878 3A78 		pea 14968.w
+ 155 00ce 2F02      		move.l %d2,-(%sp)
+ 156 00d0 4E93      		jsr (%a3)
+ 157 00d2 4FEF 0018 		lea (24,%sp),%sp
+ 158 00d6 4A80      		tst.l %d0
+ 159 00d8 669C      		jne .L14
+ 160 00da 2F04      		move.l %d4,-(%sp)
+ 161 00dc 4878 0008 		pea 8.w
+ 162 00e0 2F03      		move.l %d3,-(%sp)
+ 163 00e2 2F02      		move.l %d2,-(%sp)
+ 164 00e4 4E94      		jsr (%a4)
+ 165 00e6 4FEF 0010 		lea (16,%sp),%sp
+ 166 00ea 4A80      		tst.l %d0
+ 167 00ec 66B6      		jne .L15
+ 168 00ee 2F2F 001E 		move.l 30(%sp),-(%sp)
+ 169 00f2 4879 0000 		pea .LC9
+ 169      0000 
+ 170 00f8 4E96      		jsr (%a6)
+ 171 00fa 2F03      		move.l %d3,-(%sp)
+ 172 00fc 4E92      		jsr (%a2)
+ 173 00fe 4879 0000 		pea .LC11
+ 173      0000 
+ 174 0104 4E96      		jsr (%a6)
+ 175 0106 4878 3A34 		pea 14900.w
+ 176 010a 2F02      		move.l %d2,-(%sp)
+ 177 010c 4E93      		jsr (%a3)
+ 178 010e 4FEF 0018 		lea (24,%sp),%sp
+ 179 0112 4A80      		tst.l %d0
+ 180 0114 6600 FF60 		jne .L14
+ 181 0118 2F04      		move.l %d4,-(%sp)
+ 182 011a 4878 0008 		pea 8.w
+ 183 011e 2F03      		move.l %d3,-(%sp)
+ 184 0120 2F02      		move.l %d2,-(%sp)
+ 185 0122 4E94      		jsr (%a4)
+ 186 0124 4FEF 0010 		lea (16,%sp),%sp
+ 187 0128 4A80      		tst.l %d0
+ 188 012a 6600 FF78 		jne .L15
+ 189 012e 2F2F 001E 		move.l 30(%sp),-(%sp)
+ 190 0132 4879 0000 		pea .LC9
+ 190      0000 
+ 191 0138 4E96      		jsr (%a6)
+ 192 013a 2F03      		move.l %d3,-(%sp)
+ 193 013c 4E92      		jsr (%a2)
+ 194 013e 4879 0000 		pea .LC12
+ 194      0000 
+ 195 0144 4E96      		jsr (%a6)
+ 196 0146 4878 3A78 		pea 14968.w
+ 197 014a 2F02      		move.l %d2,-(%sp)
+ 198 014c 4E93      		jsr (%a3)
+ 199 014e 4FEF 0018 		lea (24,%sp),%sp
+ 200 0152 4A80      		tst.l %d0
+ 201 0154 6600 FF20 		jne .L14
+ 202 0158 2F04      		move.l %d4,-(%sp)
+ 203 015a 4878 0008 		pea 8.w
+ 204 015e 2F03      		move.l %d3,-(%sp)
+ 205 0160 2F02      		move.l %d2,-(%sp)
+ 206 0162 4E94      		jsr (%a4)
+ 207 0164 4FEF 0010 		lea (16,%sp),%sp
+ 208 0168 4A80      		tst.l %d0
+ 209 016a 6600 FF38 		jne .L15
+ 210 016e 2F2F 001E 		move.l 30(%sp),-(%sp)
+ 211 0172 4879 0000 		pea .LC9
+ 211      0000 
+ 212 0178 4E96      		jsr (%a6)
+ 213 017a 2F03      		move.l %d3,-(%sp)
+ 214 017c 4E92      		jsr (%a2)
+ 215 017e 2F02      		move.l %d2,-(%sp)
+ 216 0180 4EB9 0000 		jsr fclose
+ 216      0000 
+ 217 0186 4FEF 0010 		lea (16,%sp),%sp
+ 218 018a 7000      		moveq #0,%d0
+ 219 018c 6000 FE9A 		jra .L7
+ 221               		.ident	"GCC: (GNU) 15.1.0"

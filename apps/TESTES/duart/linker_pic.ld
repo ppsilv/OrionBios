@@ -27,12 +27,21 @@ SECTIONS
         *(.data*)
     } > SLOT :data
 
+    . = ALIGN(4);
+    .got : {
+        _got_start = .;
+        *(.got.plt) *(.got)
+        _got_end = .;
+    } > SLOT :data
+
     .bss : {
         *(.bss*)
         *(COMMON)
         _bss_end = .;
     } > SLOT :data
 
+
     _end = .;
     /DISCARD/ : { *(.comment) *(.note*) *(.eh_frame*) }
 }
+

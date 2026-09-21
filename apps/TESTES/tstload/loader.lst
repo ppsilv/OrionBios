@@ -1,0 +1,19 @@
+   1               	# 0 "call_with_a5.S"
+   2               	# 0 "<built-in>"
+   3               	# 0 "<command-line>"
+   4               	# 1 "call_with_a5.S"
+   1               	
+   2               	
+   3               	.global call_with_a5
+   4               	
+   5               	call_with_a5:
+   6               	    /* args on stack per m68k C ABI: entry_addr, a5_value, argc, argv */
+   7 0000 206F 0004 	    move.l  4(%sp), %a0      /* entry_addr */
+   8 0004 2A6F 0008 	    move.l  8(%sp), %a5      /* a5_value */
+   9 0008 202F 000C 	    move.l  12(%sp), %d0     /* argc */
+  10 000c 226F 0010 	    move.l  16(%sp), %a1     /* argv */
+  11 0010 2F09      	    move.l  %a1, -(%sp)
+  12 0012 2F00      	    move.l  %d0, -(%sp)
+  13 0014 4E90      	    jsr     (%a0)
+  14 0016 508F      	    addq.l  #8, %sp
+  15 0018 4E75      	    rts

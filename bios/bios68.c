@@ -32,7 +32,7 @@ volatile __attribute__((section(".mram"))) long systemTick;
 volatile __attribute__((section(".mram"))) unsigned int tick_count;
 volatile __attribute__((section(".mram"))) unsigned int flg_system;
 
-uint32_t *last_mem_address = (volatile uint32_t *)0x80600UL;
+volatile uint32_t *last_mem_address = ( uint32_t *)0x80600UL;
 
 #include "./tools/build_counter.h"
 
@@ -64,7 +64,7 @@ void print_msg(char *str){
 
 const char MsgOrionInit[] = 
     "\nPDS317-Hardware copyright (C) pdsilva(pgordao).\n"
-    "bios68 V1.0.1 for m68k System.\n"
+    "bios68 V1.0.2 for m68k System.\n"
     "Build Date: " __DATE__ " - " __TIME__ "\n"
     "Build Counter: " BUILD_COUNTER "\n"
     "-----------------------------------------------\n\n";
@@ -99,6 +99,26 @@ void display_prompt(void)
         }
     } else {
         printf("0:/> ");
+    }
+}
+
+/*
+f_mount(&FatFs0, "0:/", 0);
+f_mount(&FatFs1, "1:/", 0);
+
+Uso:
+f_open(&file, "0:/arquivo1.txt", FA_READ);  // Usa o drive 0 
+f_open(&file, "1:/arquivo2.txt", FA_READ);  // Usa o drive 1 
+*/
+
+void do_ideinit(int argc, char *argv[])
+{
+    FRESULT fr;
+    fr = f_mount(&FatFs, "0:/", 0);
+    if (fr != FR_OK) {
+        printf("ERROR: Erro ao montar FAT No disks available ");
+    }else{
+        printf(": FAT success mounted! ");
     }
 }
 
@@ -175,10 +195,6 @@ void main() {
     display_prompt();
     pico_write_ch('L');
     while (1){
-        //if (getline(g_cmd_buffer, LINELEN) != -1) {
-        //    execute_cmd(g_cmd_buffer);
-        //    display_prompt();
-        //}
         readline_with_history(g_cmd_buffer);
         history_add(g_cmd_buffer); 
         execute_cmd(g_cmd_buffer);
@@ -186,24 +202,3 @@ void main() {
     }
 
 }
-
-#ifdef BUCETON
-#include <stdint.h>
-
-typedef struct {
-    char     name[8];        /* 0x00: Nome do arquivo ou pasta (completado com espaços) */
-    char     ext[3];         /* 0x08: Extensão do arquivo (completado com espaços) */
-    uint8_t  attr;           /* 0x0B: Atributos (0x10 = Diretório, 0x20 = Arquivo/Archive, etc.) */
-    uint8_t  nt_res;         /* 0x0C: Reservado para o Windows NT (pode deixar 0) */
-    uint8_t  crt_time_tenth; /* 0x0D: Décimos de segundo da criação (0 a 199) */
-    uint16_t crt_time;       /* 0x0E: Hora de criação (formato MS-DOS compactado) */
-    uint16_t crt_date;       /* 0x10: Data de criação (formato MS-DOS compactado) */
-    uint16_t lst_acc_date;   /* 0x12: Data do último acesso (formato MS-DOS) */
-    uint16_t fst_clus_hi;    /* 0x14: Cluster inicial - Parte Alta (Sempre 0 na FAT16) */
-    uint16_t wrt_time;       /* 0x16: Hora da última modificação */
-    uint16_t wrt_date;       /* 0x18: Data da última modificação */
-    uint16_t fst_clus_lo;    /* 0x1A: Cluster inicial - Parte Baixa (Onde o arquivo começa) */
-    uint32_t file_size;      /* 0x1C: Tamanho do arquivo em bytes (0 para diretórios) */
-} __attribute__((packed)) FAT_DIR_ENTRY;
-
-#endif

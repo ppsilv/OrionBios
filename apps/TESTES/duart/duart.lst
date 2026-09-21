@@ -1,0 +1,330 @@
+   1               	#NO_APP
+   2               		.file	"duart_a.c"
+   3               		.text
+   4               		.align	2
+   5               		.globl	duart_a_init_9600
+   7               	duart_a_init_9600:
+   8 0000 13FC 0000 		move.b #0,16748553
+   8      00FF 9009 
+   9 0008 13FC FFBB 		move.b #-69,16748547
+   9      00FF 9003 
+  10 0010 207C 00FF 		move.l #16748549,%a0
+  10      9005 
+  11 0016 10BC 0010 		move.b #16,(%a0)
+  12 001a 227C 00FF 		move.l #16748545,%a1
+  12      9001 
+  13 0020 12BC 0013 		move.b #19,(%a1)
+  14 0024 12BC 0007 		move.b #7,(%a1)
+  15 0028 10BC 0020 		move.b #32,(%a0)
+  16 002c 10BC 0030 		move.b #48,(%a0)
+  17 0030 10BC 0005 		move.b #5,(%a0)
+  18 0034 4E75      		rts
+  20               		.align	2
+  21               		.globl	duart_a_init_38400
+  23               	duart_a_init_38400:
+  24 0036 13FC 0000 		move.b #0,16748553
+  24      00FF 9009 
+  25 003e 13FC FFCC 		move.b #-52,16748547
+  25      00FF 9003 
+  26 0046 207C 00FF 		move.l #16748549,%a0
+  26      9005 
+  27 004c 10BC 0010 		move.b #16,(%a0)
+  28 0050 227C 00FF 		move.l #16748545,%a1
+  28      9001 
+  29 0056 12BC 0013 		move.b #19,(%a1)
+  30 005a 12BC 0007 		move.b #7,(%a1)
+  31 005e 10BC 0020 		move.b #32,(%a0)
+  32 0062 10BC 0030 		move.b #48,(%a0)
+  33 0066 10BC 0005 		move.b #5,(%a0)
+  34 006a 4E75      		rts
+  36               		.align	2
+  37               		.globl	duart_a_init_115200
+  39               	duart_a_init_115200:
+  40 006c 13FC 0000 		move.b #0,16748553
+  40      00FF 9009 
+  41 0074 13FC FFEE 		move.b #-18,16748547
+  41      00FF 9003 
+  42 007c 207C 00FF 		move.l #16748549,%a0
+  42      9005 
+  43 0082 10BC 0010 		move.b #16,(%a0)
+  44 0086 227C 00FF 		move.l #16748545,%a1
+  44      9001 
+  45 008c 12BC 0013 		move.b #19,(%a1)
+  46 0090 12BC 0007 		move.b #7,(%a1)
+  47 0094 10BC 0020 		move.b #32,(%a0)
+  48 0098 10BC 0030 		move.b #48,(%a0)
+  49 009c 10BC 0005 		move.b #5,(%a0)
+  50 00a0 4E75      		rts
+  52               		.align	2
+  53               		.globl	duart_a_recv_char
+  55               	duart_a_recv_char:
+  56               	.L5:
+  57 00a2 1039 00FF 		move.b 16748547,%d0
+  57      9003 
+  58 00a8 0800 0000 		btst #0,%d0
+  59 00ac 67F4      		jeq .L5
+  60 00ae 1039 00FF 		move.b 16748551,%d0
+  60      9007 
+  61 00b4 4E75      		rts
+  63               		.align	2
+  64               		.globl	duart_a_send_char
+  66               	duart_a_send_char:
+  67 00b6 202F 0004 		move.l 4(%sp),%d0
+  68               	.L9:
+  69 00ba 1239 00FF 		move.b 16748547,%d1
+  69      9003 
+  70 00c0 44C1      		move.w %d1,%ccr
+  71 00c2 66F6      		jne .L9
+  72 00c4 13C0 00FF 		move.b %d0,16748551
+  72      9007 
+  73 00ca 4E75      		rts
+  75               		.align	2
+  76               		.globl	duart_a_char_available
+  78               	duart_a_char_available:
+  79 00cc 1039 00FF 		move.b 16748547,%d0
+  79      9003 
+  80 00d2 0200 0001 		and.b #1,%d0
+  81 00d6 4E75      		rts
+  83               		.align	2
+  84               		.globl	cputs
+  86               	cputs:
+  87 00d8 2F0D      		move.l %a5,-(%sp)
+  88 00da 2F0A      		move.l %a2,-(%sp)
+  89 00dc 246F 000C 		move.l 12(%sp),%a2
+  90               	.L14:
+  91 00e0 1012      		move.b (%a2),%d0
+  92 00e2 6606      		jne .L15
+  93 00e4 245F      		move.l (%sp)+,%a2
+  94 00e6 2A5F      		move.l (%sp)+,%a5
+  95 00e8 4E75      		rts
+  96               	.L15:
+  97 00ea 528A      		addq.l #1,%a2
+  98 00ec 4880      		ext.w %d0
+  99 00ee 3040      		move.w %d0,%a0
+ 100 00f0 2F08      		move.l %a0,-(%sp)
+ 101 00f2 206D 0000 		move.l putchar@GOT(%a5),%a0
+ 102 00f6 4E90      		jsr (%a0)
+ 103 00f8 588F      		addq.l #4,%sp
+ 104 00fa 60E4      		jra .L14
+ 106               		.align	2
+ 107               		.globl	cputss
+ 109               	cputss:
+ 110 00fc 2F0D      		move.l %a5,-(%sp)
+ 111 00fe 2F0A      		move.l %a2,-(%sp)
+ 112 0100 246F 000C 		move.l 12(%sp),%a2
+ 113               	.L17:
+ 114 0104 1012      		move.b (%a2),%d0
+ 115 0106 6606      		jne .L18
+ 116 0108 245F      		move.l (%sp)+,%a2
+ 117 010a 2A5F      		move.l (%sp)+,%a5
+ 118 010c 4E75      		rts
+ 119               	.L18:
+ 120 010e 528A      		addq.l #1,%a2
+ 121 0110 0280 0000 		and.l #255,%d0
+ 121      00FF 
+ 122 0116 2F00      		move.l %d0,-(%sp)
+ 123 0118 206D 0000 		move.l duart_a_send_char@GOT(%a5),%a0
+ 124 011c 4E90      		jsr (%a0)
+ 125 011e 588F      		addq.l #4,%sp
+ 126 0120 60E2      		jra .L17
+ 128               		.section	.rodata.str1.1,"aMS",@progbits,1
+ 129               	.LC0:
+ 130 0000 2D2D 2D20 		.string	"--- %s (%zu bytes) ---\n"
+ 130      2573 2028 
+ 130      257A 7520 
+ 130      6279 7465 
+ 130      7329 202D 
+ 131               	.LC1:
+ 132 0018 2530 3258 		.string	"%02X "
+ 132      2000 
+ 133               	.LC2:
+ 134 001e 2E00      		.string	"."
+ 135               	.LC3:
+ 136 0020 2563 00   		.string	"%c"
+ 137               	.LC4:
+ 138 0023 0A00      		.string	"\n"
+ 139               		.text
+ 140               		.align	2
+ 141               		.globl	dumphex
+ 143               	dumphex:
+ 144 0122 48E7 303C 		movem.l #12348,-(%sp)
+ 145 0126 246F 0020 		move.l 32(%sp),%a2
+ 146 012a 262F 0024 		move.l 36(%sp),%d3
+ 147 012e 2F03      		move.l %d3,-(%sp)
+ 148 0130 2F2F 0020 		move.l 32(%sp),-(%sp)
+ 149 0134 2F2D 0000 		move.l .LC0@GOT(%a5),-(%sp)
+ 150 0138 266D 0000 		move.l printf@GOT(%a5),%a3
+ 151 013c 4E93      		jsr (%a3)
+ 152 013e 4FEF 000C 		lea (12,%sp),%sp
+ 153 0142 7400      		moveq #0,%d2
+ 154               	.L20:
+ 155 0144 B682      		cmp.l %d2,%d3
+ 156 0146 660E      		jne .L25
+ 157 0148 2F6D 0000 		move.l .LC4@GOT(%a5),28(%sp)
+ 157      001C 
+ 158 014e 224B      		move.l %a3,%a1
+ 159 0150 4CDF 3C0C 		movem.l (%sp)+,#15372
+ 160 0154 4ED1      		jmp (%a1)
+ 161               	.L25:
+ 162 0156 7000      		moveq #0,%d0
+ 163 0158 1012      		move.b (%a2),%d0
+ 164 015a 2F00      		move.l %d0,-(%sp)
+ 165 015c 2F2D 0000 		move.l .LC1@GOT(%a5),-(%sp)
+ 166 0160 4E93      		jsr (%a3)
+ 167 0162 5282      		addq.l #1,%d2
+ 168 0164 700F      		moveq #15,%d0
+ 169 0166 C082      		and.l %d2,%d0
+ 170 0168 508F      		addq.l #8,%sp
+ 171 016a 6624      		jne .L21
+ 172 016c 49EA FFF0 		lea (-16,%a2),%a4
+ 173               	.L24:
+ 174 0170 101C      		move.b (%a4)+,%d0
+ 175 0172 0C00 001F 		cmp.b #31,%d0
+ 176 0176 621C      		jhi .L22
+ 177 0178 2F2D 0000 		move.l .LC2@GOT(%a5),-(%sp)
+ 178 017c 206D 0000 		move.l puts@GOT(%a5),%a0
+ 179 0180 4E90      		jsr (%a0)
+ 180 0182 588F      		addq.l #4,%sp
+ 181               	.L23:
+ 182 0184 B5CC      		cmp.l %a4,%a2
+ 183 0186 66E8      		jne .L24
+ 184 0188 2F2D 0000 		move.l .LC4@GOT(%a5),-(%sp)
+ 185 018c 4E93      		jsr (%a3)
+ 186 018e 588F      		addq.l #4,%sp
+ 187               	.L21:
+ 188 0190 528A      		addq.l #1,%a2
+ 189 0192 60B0      		jra .L20
+ 190               	.L22:
+ 191 0194 0280 0000 		and.l #255,%d0
+ 191      00FF 
+ 192 019a 2F00      		move.l %d0,-(%sp)
+ 193 019c 2F2D 0000 		move.l .LC3@GOT(%a5),-(%sp)
+ 194 01a0 4E93      		jsr (%a3)
+ 195 01a2 508F      		addq.l #8,%sp
+ 196 01a4 60DE      		jra .L23
+ 198               		.section	.rodata.str1.1
+ 199               	.LC5:
+ 200 0025 7462 3939 		.string	"tb99.bas"
+ 200      2E62 6173 
+ 200      00
+ 201               	.LC6:
+ 202 002e 4572 726F 		.string	"Erro ao tentar abrir o arquivo\n"
+ 202      2061 6F20 
+ 202      7465 6E74 
+ 202      6172 2061 
+ 202      6272 6972 
+ 203               	.LC7:
+ 204 004e 4172 7175 		.string	"Arquivo aberto\n"
+ 204      6976 6F20 
+ 204      6162 6572 
+ 204      746F 0A00 
+ 205               	.LC8:
+ 206 005e 4E61 6F20 		.string	"Nao foi possivel ler o header do ELF.\n"
+ 206      666F 6920 
+ 206      706F 7373 
+ 206      6976 656C 
+ 206      206C 6572 
+ 207               	.LC9:
+ 208 0085 5365 7269 		.string	"Serial-Arquivo aberto\n"
+ 208      616C 2D41 
+ 208      7271 7569 
+ 208      766F 2061 
+ 208      6265 7274 
+ 209               	.LC10:
+ 210 009c 636F 6E74 		.string	"contador[%04x] *ptr_contador[%04x]\n"
+ 210      6164 6F72 
+ 210      5B25 3034 
+ 210      785D 202A 
+ 210      7074 725F 
+ 211               		.section	.text.startup,"ax",@progbits
+ 212               		.align	2
+ 213               		.globl	main
+ 215               	main:
+ 216 0000 4E56 FCCC 		link.w %fp,#-820
+ 217 0004 48E7 2024 		movem.l #8228,-(%sp)
+ 218 0008 4878 0001 		pea 1.w
+ 219 000c 2D6D 0000 		move.l .LC5@GOT(%a5),-814(%fp)
+ 219      FCD2 
+ 220 0012 2F2E FCD2 		move.l -814(%fp),-(%sp)
+ 221 0016 41EE FDDA 		lea (-550,%fp),%a0
+ 222 001a 2D48 FCCE 		move.l %a0,-818(%fp)
+ 223 001e 486E FDDA 		pea -550(%fp)
+ 224 0022 206D 0000 		move.l fopen@GOT(%a5),%a0
+ 225 0026 4E90      		jsr (%a0)
+ 226 0028 4FEF 000C 		lea (12,%sp),%sp
+ 227 002c 246D 0000 		move.l cputs@GOT(%a5),%a2
+ 228 0030 4A80      		tst.l %d0
+ 229 0032 670C      		jeq .L28
+ 230 0034 2F2D 0000 		move.l .LC6@GOT(%a5),-(%sp)
+ 231 0038 4E92      		jsr (%a2)
+ 232 003a 588F      		addq.l #4,%sp
+ 233               	.L29:
+ 234 003c 7000      		moveq #0,%d0
+ 235 003e 604A      		jra .L27
+ 236               	.L28:
+ 237 0040 2F2D 0000 		move.l .LC7@GOT(%a5),-(%sp)
+ 238 0044 4E92      		jsr (%a2)
+ 239 0046 42A7      		clr.l -(%sp)
+ 240 0048 486E FDDA 		pea -550(%fp)
+ 241 004c 206D 0000 		move.l flseek@GOT(%a5),%a0
+ 242 0050 4E90      		jsr (%a0)
+ 243 0052 486E FCD6 		pea -810(%fp)
+ 244 0056 4878 0100 		pea 256.w
+ 245 005a 240E      		move.l %fp,%d2
+ 246 005c 0682 FFFF 		add.l #-806,%d2
+ 246      FCDA 
+ 247 0062 2F02      		move.l %d2,-(%sp)
+ 248 0064 486E FDDA 		pea -550(%fp)
+ 249 0068 206D 0000 		move.l fread@GOT(%a5),%a0
+ 250 006c 4E90      		jsr (%a0)
+ 251 006e 4FEF 001C 		lea (28,%sp),%sp
+ 252 0072 4A80      		tst.l %d0
+ 253 0074 660A      		jne .L30
+ 254 0076 0CAE 0000 		cmp.l #256,-810(%fp)
+ 254      0100 FCD6 
+ 255 007e 6714      		jeq .L31
+ 256               	.L30:
+ 257 0080 2F2D 0000 		move.l .LC8@GOT(%a5),-(%sp)
+ 258 0084 4E92      		jsr (%a2)
+ 259 0086 588F      		addq.l #4,%sp
+ 260 0088 7001      		moveq #1,%d0
+ 261               	.L27:
+ 262 008a 4CEE 2404 		movem.l -832(%fp),#9220
+ 262      FCC0 
+ 263 0090 4E5E      		unlk %fp
+ 264 0092 4E75      		rts
+ 265               	.L31:
+ 266 0094 4878 0100 		pea 256.w
+ 267 0098 2F02      		move.l %d2,-(%sp)
+ 268 009a 2F2E FCD2 		move.l -814(%fp),-(%sp)
+ 269 009e 206D 0000 		move.l dumphex@GOT(%a5),%a0
+ 270 00a2 4E90      		jsr (%a0)
+ 271 00a4 486E FDDA 		pea -550(%fp)
+ 272 00a8 206D 0000 		move.l fclose@GOT(%a5),%a0
+ 273 00ac 4E90      		jsr (%a0)
+ 274 00ae 2F2D 0000 		move.l .LC9@GOT(%a5),-(%sp)
+ 275 00b2 206D 0000 		move.l cputss@GOT(%a5),%a0
+ 276 00b6 4E90      		jsr (%a0)
+ 277 00b8 206D 0000 		move.l ptr_contador@GOT(%a5),%a0
+ 278 00bc 2050      		move.l (%a0),%a0
+ 279 00be 2F10      		move.l (%a0),-(%sp)
+ 280 00c0 206D 0000 		move.l contador@GOT(%a5),%a0
+ 281 00c4 2F10      		move.l (%a0),-(%sp)
+ 282 00c6 2F2D 0000 		move.l .LC10@GOT(%a5),-(%sp)
+ 283 00ca 206D 0000 		move.l printf@GOT(%a5),%a0
+ 284 00ce 4E90      		jsr (%a0)
+ 285 00d0 4FEF 0020 		lea (32,%sp),%sp
+ 286 00d4 206D 0000 		move.l print@GOT(%a5),%a0
+ 287 00d8 4E90      		jsr (%a0)
+ 288 00da 6000 FF60 		jra .L29
+ 290               		.globl	ptr_contador
+ 291               		.section	.data.rel,"aw"
+ 292               		.align	2
+ 295               	ptr_contador:
+ 296 0000 0000 0000 		.long	contador
+ 297               		.globl	contador
+ 298               		.data
+ 299               		.align	2
+ 302               	contador:
+ 303 0000 0000 FFFF 		.long	65535
+ 304               		.ident	"GCC: (GNU) 15.1.0"

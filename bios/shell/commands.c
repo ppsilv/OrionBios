@@ -18,7 +18,7 @@
 #include "drv_uart.h"
 #include "picow.h"
 #include "color.h"
-#include "../kbd/ringbuffer.h"
+#include "kbd/ringbuffer.h"
 
 
 #define PICO_STATUS_REG  (*(volatile uint8_t *)0xFF9103)
@@ -314,16 +314,7 @@ void do_exit(int argc, char *argv[]){
     f_mount(NULL, "0:", 0);
     printf("YOU CAN TURN OFF THE SYSTEM.\n");
 }
-void do_ideinit(int argc, char *argv[])
-{
-    FRESULT fr;
-    fr = f_mount(&FatFs, "", 0);
-    if (fr != FR_OK) {
-        printf("PANIC: Erro ao montar FAT: %d\n", fr);
-    }else{
-        printf(": FAT success mounted!\n");
-    }
-}
+
 
 void do_idemode(int argc, char *argv[])
 {

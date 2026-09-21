@@ -3,7 +3,7 @@ LD = m68k-elf-ld
 OBJCOPY = m68k-elf-objcopy
 VASM = vasmm68k_mot 
 
-CFLAGS = -Wall -O0 -I ./includes -I../include -ffreestanding -nostdlib
+CFLAGS = -Wall -Os -I../include -ffreestanding -nostdlib
 CFLAGS += -DCHIP_$(CHIP_TYPE) -DROM_SIZE_BYTES=$(ROM_SIZE)
 CFLAGS += -fomit-frame-pointer
 
@@ -17,36 +17,33 @@ ASMS = ./sys/vectors/vectors_asm.S \
 ./sys/traps/trap2_asm.S \
 ./sys/traps/trap4_asm.S \
 ./sys/traps/trap12_asm.S \
-./duart/duartasm.S \
-./cpm/cpm_bios.S
+../drivers/duart/duartasm.S
 
 VASMS =
 
 # Lista de arquivos C
 SRCS = bios68.c timers.c interrupt.c \
 ./dump/mem_dump.c \
-./shell/io.c \
-./shell/picow.c \
+./shell/vid_ram_bios.c \
 ./shell/elf_loader.c \
 ./shell/printerro.c \
 ./shell/commands.c \
-./shell/decodecmd.c \
+./shell/shell.c \
 ./shell/crc32.c \
-./shell/cmd_repeat.c \
-./shell/vid_ram_bios.c \
 ./shell/shell_history.c \
-./kbd/ringbuffer.c \
-./rtc/i2cbb.c \
-./uarts/drv_uart0.c \
-./duart/duart.c \
 ./sys/traps/trap12.c \
 ./sys/vectors/vectors.c \
 ./sys/vectors/jumptable.c \
 ./sys/console/console.c \
 ./sys/ethernet/dhcp_client.c \
-./picoVga/drv_picoVga.c \
-./ide/ata.c \
-./ide/diskio.c
+../drivers/kbd/ringbuffer.c \
+../drivers/rtc/i2cbb.c \
+../drivers/uarts/drv_uart0.c \
+../drivers/duart/duart.c \
+../drivers/picoVga/drv_picoVga.c \
+../drivers/picoW/picow.c \
+../drivers/ide/ata.c \
+../drivers/ide/diskio.c
 
 #./tst_fat/tstfat.c
 #./picoVga/drv_picoVga.c \

@@ -9,7 +9,6 @@
  * ========================================================================= */
 
 void do_open(int argc, char *argv[]) {
-    printf("Filename[%s]\n",argv[1]);
     f_open((FIL *)argv[0], (const char *)argv[1], (BYTE)(uint32_t)argv[2]);
 }
 
@@ -29,8 +28,8 @@ void do_sync(int argc, char *argv[]) {
     f_sync((FIL *)argv[0]);
 }
 
-void do_lseek(int argc, char *argv[]) {
-    f_lseek((FIL *)argv[0], (FSIZE_t)(uint32_t)argv[1]);
+int do_lseek(int argc, char *argv[]) {
+    return f_lseek((FIL *)argv[0], (FSIZE_t)argv[1]);
 }
 
 FSIZE_t do_tell(int argc, char *argv[]) {

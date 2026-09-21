@@ -5,12 +5,14 @@
  * seta pra baixo (0x11) -- byte unico, sem sequencia de escape, pelo
  * que voce reportou do seu terminal.
  *
- * INTEGRACAO: troque a leitura de caractere (getchar_serial) e escrita
- * (putchar_serial/puts_serial) pelas funcoes reais que seu shell ja
+ * INTEGRACAO: troque a leitura de caractere (ring_buf_get_char) e escrita
+ * (picovga_putchar_serial/vputs_serial) pelas funcoes reais que seu shell ja
  * usa hoje pra ler/escrever no console.
  */
+#include <stdio.h>
 #include <string.h>
 #include <stdint.h>
+#include "kbd/ringbuffer.h"
 
 #define HIST_SIZE   16    /* quantos comandos guardar -- ajuste como quiser */
 #define LINE_MAX    128   /* tamanho maximo de uma linha de comando */
@@ -20,9 +22,9 @@
 #define KEY_BS     0x08   /* AJUSTE se seu backspace for outro codigo (ex: 0x7F) */
 #define KEY_ENTER  '\r'   /* ou '\n', conforme seu terminal manda */
 
-extern int  getchar(void);
-extern void putchar(char c);
-extern void puts(const char *s);
+
+extern void picovga_putchar(char c);
+extern void vputs(const char *s);
 
 static char history[HIST_SIZE][LINE_MAX];
 static int  hist_count = 0;     /* quantos comandos ja foram guardados no total */
@@ -35,9 +37,9 @@ static int  hist_cursor = -1;   /* -1 = "linha nova" (fora do historico) */
  */
 static void redraw_line(int old_len, const char *text)
 {
-    for (int i = 0; i < old_len; i++) putchar('\b');
-    for (int i = 0; i < old_len; i++) putchar(' ');
-    for (int i = 0; i < old_len; i++) putchar('\b');
+    for (int i = 0; i < old_len; i++) picovga_putchar('\b');
+    for (int i = 0; i < old_len; i++) picovga_putchar(' ');
+    for (int i = 0; i < old_len; i++) picovga_putchar('\b');
     puts(text);
 }
 
@@ -71,10 +73,10 @@ void readline_with_history(char *buf)
     hist_cursor = -1;
 
     for (;;) {
-        int c = getchar();
+        int c = ring_buf_get_char();
 
         if (c == KEY_ENTER) {
-            putchar('\n');
+            picovga_putchar('\n');
             buf[len] = '\0';
             return;
         }
@@ -83,9 +85,9 @@ void readline_with_history(char *buf)
             if (len > 0) {
                 len--;
                 buf[len] = '\0';
-                putchar('\b');
-                putchar(' ');
-                putchar('\b');
+                picovga_putchar('\b');
+                picovga_putchar(' ');
+                picovga_putchar('\b');
             }
             continue;
         }
@@ -123,7 +125,7 @@ void readline_with_history(char *buf)
         if (len < LINE_MAX - 1) {
             buf[len++] = (char) c;
             buf[len] = '\0';
-            putchar((char) c);
+            picovga_putchar((char) c);
         }
     }
 }
@@ -133,7 +135,7 @@ void readline_with_history(char *buf)
  *
  *   char cmdline[LINE_MAX];
  *   for (;;) {
- *       puts_serial("orion> ");
+ *       vputs_serial("orion> ");
  *       readline_with_history(cmdline);
  *       history_add(cmdline);      // grava ANTES ou DEPOIS de executar,
  *                                  // tanto faz, contanto que seja sempre
