@@ -1,0 +1,36 @@
+GAL22V10
+IDEGLUE
+;1   2   3   4   5   6   7   8   9   10    11 12  
+IOCS A19 A18 A17 A16 A15 A14 A13 A12 CPURW AS GND
+
+;13 14   15  16  17  18  19      20   21    22         23     24   
+LDS UDS  NC  NC  RD  WR  CSIDE2  DS   CSIDE CSTASKFILE CSDATA VCC
+
+;FE0XXXX
+/CSDATA     = /IOCS * A19 * A18 * A17 * /A16 * /A15 * /A14 * /A13 * /A12 * /AS * /UDS * /LDS
+/CSTASKFILE = /IOCS * A19 * A18 * A17 * /A16 * /A15 * /A14 * /A13 * /A12 * /AS *  UDS * /LDS
+/CSIDE      = /IOCS * A19 * A18 * A17 * /A16 * /A15 * /A14 * /A13 * /A12 * /AS * /LDS
+/DS         = /IOCS * A19 * A18 * A17 * /A16 * /A15 * /A14 * /A13 * /A12 * /AS * /LDS
+/RD         = /AS * /LDS *  CPURW
+/WR         = /AS * /LDS * /CPURW
+;FE1XXXX
+/CSIDE2     = /IOCS * A19 * A18 * A17 * /A16 * /A15 * /A14 * /A13 *  A12 * /AS * /LDS
+
+DESCRIPTION
+
+galette picoide.pld
+
+Pino 7 (antes NC) foi usado como A4, bit que falta entre os pinos originais
+para diferenciar o PicoIDE (0xFE0000-0xFE000F, A4=0) do MIDE IDE
+(0xFE0010-0xFE001F, A4=1). Ajuste se A4 estiver ligado em outro pino.
+
+/CSDATA      -> registrador DATA do PicoIDE (word: UDS e LDS ativos)
+/CSTASKFILE  -> demais registradores do PicoIDE (byte impar: so LDS ativo)
+/CSIDE       -> OR de CSDATA/CSTASKFILE (simplifica para /LDS, pois LDS
+                esta ativo nos dois casos)
+/CSIDE2      -> todo o bloco do MIDE IDE, sem separar DATA/TASKFILE
+                (assume que a placa MIDE decodifica registrador internamente
+                via A1-A3 ligados direto)
+/DS          -> "pronto"/ack combinado, ativo para qualquer um dos dois blocos
+/RD, /WR     -> strobes dedicados, gerados so para o MIDE IDE (A4=1),
+                a partir de CPURW
