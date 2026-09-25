@@ -7,6 +7,9 @@
 event_timer_t *g_timers[MAX_TIMERS];
 uint32_t g_tick_count;
 
+extern uint32_t get_system_tick(void);
+
+
 void delay10ms(unsigned int tempo){
     unsigned long time_start = get_system_tick();
     while((get_system_tick() - time_start) <= tempo);            

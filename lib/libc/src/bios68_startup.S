@@ -190,31 +190,43 @@ go_ahead:
 
         MOVE.B  #'7',WR_CHAR
 
+        /*INSTALLING INT2 HANDLER*/
         move.l  #Int2Handler, -(%SP)     | handler_addr = OS_TickISR (empilhado 1o, e' o ultimo parametro)
         move.l  #0x00080090, -(%SP)      | stub_addr = 0x00080090 (empilhado 2o, e' o 1o parametro)
         BSR     sys_setramvector           | Chama a função C
         ADDA.L  #8, %SP                  | 2 argumentos * 4 bytes = 8 (o comentario diz "3 argumentos", mas a conta certa e' 2)
 
-        move.l  #5,%D1
+        move.l  #1,%D1
         BSR     delay_seconds
         MOVE.B  #'8',WR_CHAR
 
+        /*INSTALLING TRAP1 HANDLER*/
         move.l  #Trap1Handler, -(%SP)     | handler_addr = trap1_handler (empilhado 1o, e' o ultimo parametro)
         move.l  #0x000800ba, -(%SP)      | stub_addr = 0x000800ba (empilhado 2o, e' o 1o parametro)
         BSR     sys_setramvector           | Chama a função C
         ADDA.L  #8, %SP                  | 2 argumentos * 4 bytes = 8 (o comentario diz "3 argumentos", mas a conta certa e' 2)
 
-        move.l  #5,%D1
+        move.l  #1,%D1
         BSR     delay_seconds
         MOVE.B  #'8',WR_CHAR
 
+        /*INSTALLING TRAP2 HANDLER*/
+        move.l  #Trap2Handler, -(%SP)     | handler_addr = trap1_handler (empilhado 1o, e' o ultimo parametro)
+        move.l  #0x000800c0, -(%SP)      | stub_addr = 0x000800ba (empilhado 2o, e' o 1o parametro)
+        BSR     sys_setramvector           | Chama a função C
+        ADDA.L  #8, %SP                  | 2 argumentos * 4 bytes = 8 (o comentario diz "3 argumentos", mas a conta certa e' 2)
 
+        move.l  #1,%D1
+        BSR     delay_seconds
+        MOVE.B  #'8',WR_CHAR
+
+        /*INSTALLING TRAPC HANDLER*/
         move.l  #TrapCHandler, -(%SP)     | handler_addr = TrapCHandler (empilhado 1o, e' o ultimo parametro)
         move.l  #0x000800fc, -(%SP)      | stub_addr = 0x000800fc (empilhado 2o, e' o 1o parametro)
         BSR     sys_setramvector           | Chama a função C
         ADDA.L  #8, %SP                  | 2 argumentos * 4 bytes = 8 (o comentario diz "3 argumentos", mas a conta certa e' 2)
 
-        move.l  #5,%D1
+        move.l  #1,%D1
         BSR     delay_seconds
         MOVE.B  #'8',WR_CHAR
 

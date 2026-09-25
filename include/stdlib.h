@@ -5,7 +5,9 @@
 #include <stddef.h>
 #include <errno.h>
 
+#ifndef NULL
 #define NULL 0
+#endif 
 
 int tolower(int c);
 int toupper(int c);

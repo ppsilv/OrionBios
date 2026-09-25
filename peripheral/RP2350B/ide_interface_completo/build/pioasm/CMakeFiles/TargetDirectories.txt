@@ -1,0 +1,7 @@
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/RP2350B/ide_interface_completo/build/pioasm/CMakeFiles/pioasm.dir
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/RP2350B/ide_interface_completo/build/pioasm/CMakeFiles/edit_cache.dir
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/RP2350B/ide_interface_completo/build/pioasm/CMakeFiles/rebuild_cache.dir
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/RP2350B/ide_interface_completo/build/pioasm/CMakeFiles/list_install_components.dir
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/RP2350B/ide_interface_completo/build/pioasm/CMakeFiles/install.dir
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/RP2350B/ide_interface_completo/build/pioasm/CMakeFiles/install/local.dir
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/RP2350B/ide_interface_completo/build/pioasm/CMakeFiles/install/strip.dir

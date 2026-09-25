@@ -24,6 +24,9 @@ extern void sdtest(void);
 #define SYSINFO_BASE   0x40000000UL
 #define CHIP_ID_REG    (*(volatile uint32_t *)(SYSINFO_BASE + 0x00))
 
+SECTOR_DEF *sd0 = NULL;
+
+
 int get_chip_id(void)
 {
     uint32_t id = CHIP_ID_REG;
@@ -103,7 +106,11 @@ int main() {
 
     kb_init();
     initPS2();
+    SECTOR_DEF *sd0;
     init_sdcard();
+
+    sd0 = get_sdcard_instance();
+    
     // Main background execution loop
     while (true) {
         // Keep the Wi-Fi architecture driver responsive (polls for network events)

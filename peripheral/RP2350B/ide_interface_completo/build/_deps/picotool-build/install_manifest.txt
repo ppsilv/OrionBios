@@ -1,0 +1,6 @@
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/RP2350B/ide_interface_completo/build/_deps/picotool/picotool
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/RP2350B/ide_interface_completo/build/_deps/picotool/picotoolTargets.cmake
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/RP2350B/ide_interface_completo/build/_deps/picotool/picotoolTargets-release.cmake
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/RP2350B/ide_interface_completo/build/_deps/picotool/picotoolConfig.cmake
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/RP2350B/ide_interface_completo/build/_deps/picotool/picotoolConfigVersion.cmake
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/RP2350B/ide_interface_completo/build/_deps/picotool/enc_bootloader.elf

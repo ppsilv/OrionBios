@@ -439,6 +439,8 @@ void ff_mutex_give (int vol);		/* Unlock sync object */
 #define	AM_SYS	0x04	/* System */
 #define AM_DIR	0x10	/* Directory */
 #define AM_ARC	0x20	/* Archive */
+#define AM_LNK	0x40	/* Archive */
+#define AM_DEV	0x80	/* Archive */
 
 
 #ifdef __cplusplus

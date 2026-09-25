@@ -43,11 +43,7 @@ unsigned long TRAP14_Handler(unsigned long d0_val, unsigned long d1_val) {
 // Sua função de leitura atômica do tick continua linda aqui
 unsigned long get_system_tick(void) {
     unsigned long tick;
-    unsigned int status_antigo;
-    
-    status_antigo = m68k_disable_level2_perfect(); 
     tick = systemTick;                     
-    m68k_restore_interrupts(status_antigo); 
     
     return tick;
 }
@@ -207,6 +203,7 @@ void __attribute__((interrupt)) TrapFHandler(){
 }
 merda merda
 // A SUA FUNÇÃO DE LEITURA FICA ASSIM:
+
 unsigned long get_system_tick(void) {
     unsigned long tick;
     unsigned int status_antigo;

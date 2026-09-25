@@ -1,0 +1,226 @@
+┌─────────────────────────────────────────┐
+│              Pico RP2350B               │
+│                                         │
+│  ┌─────────────┐    ┌─────────────────┐ │
+│  │  PIO IDE    │    │  PIO SPI SD     │ │
+│  │  (interface │    │  (interface     │ │
+│  │   com M68K) │    │   com SD Card)  │ │
+│  └──────┬──────┘    └────────┬────────┘ │
+│         │                    │          │
+│         │    ┌──────────┐    │          │
+│         └────┤  Núcleo  ├────┘          │
+│              │ (tradutor│               │
+│              │  IDE↔SD) │               │
+│              └──────────┘               │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │  Buffer de setor (512 bytes)    │    │
+│  └─────────────────────────────────┘    │
+└─────────────────────────────────────────┘
+
++--------------------+----------+----------------------------------------------+
+|Registrador IDE	 | Endereço | O que o Pico faz                             |
+|                    | no M68K  |                                              |
++--------------------+----------+----------------------------------------------+
+| Data (16 bits)	 | 0xFF9141	| Buffer de dados (leitura/escrita de 16 bits) |
+| Error / Features   | 0xFF9143	| Status de erro / features                    |
+| Sector Count	     | 0xFF9145	| Quantidade de setores a transferir           |
+| LBA Low	         | 0xFF9147	| Byte baixo do endereço LBA                   |
+| LBA Mid	         | 0xFF9149	| Byte do meio do endereço LBA                 |
+| LBA High	         | 0xFF914B	| Byte alto do endereço LBA                    |
+| Device / Head	     | 0xFF914D	| Seleção de dispositivo/head                  |
+| Status / Command   | 0xFF914F	| Status (leitura) / Comando (escrita)         |
++--------------------+----------+----------------------------------------------+
+
+Faz sentido, é o comportamento padrão que qualquer driver ATA (incluindo o MIDE) 
+já espera. Dá pra encaixar isso na estrutura de buffer duplo sem complicar muito:
+
+DMA_B configurado por setor, não em modo livre contínuo: em vez de deixar o DMA_B 
+rodando indefinidamente puxando word após word da PSRAM pro TX FIFO da SM Data, 
+configure ele pra transferir exatamente 256 words (um setor) e então gerar uma 
+interrupção de conclusão pro core.
+
+Sequência por setor:
+
+1.  Comando READ SECTORS recebido → core seta BSY=1 no shadow Status, dispara DMA_A 
+    pro primeiro setor (SD→buffer A)
+2.  DMA_A termina → core seta DRQ=1, BSY=0, arma DMA_B pra puxar os 256 words do 
+    buffer A → e, em paralelo, já dispara DMA_A pro buffer B (setor seguinte), se 
+    Sector Count > 1 
+3.  Driver MIDE vê DRQ=1 (via polling de Status pela SM lenta), começa a ler a Data 
+    register — SM Data serve cada word com /DTACK imediato, DMA_B alimentando o FIFO 
+    automaticamente, sem intervenção do core durante o burst
+4.  Ao completar os 256 words, DMA_B dispara IRQ pro core → core zera DRQ imediatamente 
+    (driver vai parar de tentar ler até ver DRQ=1 de novo)
+5.  Se buffer B já estiver pronto (SD terminou em paralelo no passo 2), core seta DRQ=1 
+    na hora e arma DMA_B pro buffer B, repetindo o ciclo; senão, mantém BSY=1 até o 
+    DMA_A terminar
+
+Isso te dá exatamente o comportamento ATA clássico — inclusive resolve elegantemente 
+aquele caso do SD lento: em vez do 68k ficar preso num move.w esperando, ele sai do 
+loop de leitura, vê DRQ=0, e fica fazendo polling do Status normalmente (que é rápido, 
+não trava o barramento), até DRQ subir de novo.
+
+O caminho de escrita é espelhado: driver escreve 256 words com DRQ=1, SM Data + DMA_C 
+enchem o buffer, ao completar dispara IRQ, core zera DRQ, dispara DMA_D (buffer→SD) em 
+paralelo com o próximo setor sendo aceito no outro buffer.
+
+
+Agora reescrevo o `.pio` com essa forma mais robusta (CS já desmembrado externamente 
+em dois sinais, e captura combinada de endereço+dado numa instrução só, evitando o 
+problema de a PIO precisar de duas janelas de pinos diferentes dentro do mesmo SM):
+São 4 arquivos: `ide_config.h` (pinos e mapa de registradores), `ide_pio.pio` (as 
+duas state machines), `ide_interface.h` (API + hooks) e `ide_interface.c` (o driver: 
+PIO/DMA, registradores shadow, máquina de estado de setor com buffer duplo, BSY/DRQ).
+
+**Pra integrar no seu projeto (Pico SDK/CMake):**
+```cmake
+pico_generate_pio_header(seu_alvo ${CMAKE_CURRENT_LIST_DIR}/ide_pio.pio)
+target_sources(seu_alvo PRIVATE ide_interface.c)
+```
+E implementar os 3 hooks declarados em `ide_interface.h` (`ide_hook_sd_read_sector`, 
+`ide_hook_sd_write_sector`, `ide_hook_psram_buffer`), ligando no seu driver de SD/PSRAM 
+já existente. Depois chame `ide_interface_init()` no boot e `ide_interface_task()` em 
+loop apertado — de preferência rodando sozinho no core1, já que ele é quem faz as chamadas
+bloqueantes de SD; as ISRs (core0) só mexem em flags e reprogramam DMA.
+
+**Pontos que ainda precisam de bancada, não confie de olho fechado:**
+1. **Ordem dos bits** na captura combinada endereço+dado da SM `ide_taskfile` — marquei 
+com `// TODO: confirmar deslocamento real` nos dois lugares em `ide_interface.c`. Isso 
+só se resolve olhando no analisador lógico com um acesso conhecido (ex. escrever `0xAA` 
+no Sector Count e ver o que chega na FIFO).
+2. **Pinagem em `ide_config.h`** — assumi barramento de dados nos GPIO 0-15 e A1-A3 logo 
+em seguida (16-18) de propósito, pra viabilizar a captura combinada numa instrução só; 
+se isso não bater com seu roteamento de placa, ajuste os `#define` e mantenha essa 
+contiguidade.
+3. **/CS desmembrado em dois sinais** (`PIN_CS_DATA` e `PIN_CS_TASKFILE`) — isso é uma 
+mudança de decisão em relação ao que discutimos antes (CS único + decodificação de 
+endereço dentro da PIO): decodificar dentro da PIO exigiria uma janela de `IN` diferente 
+pra cada checagem, o que não dá pra fazer com uma base fixa só. Ficou mais simples 
+empurrar isso pro seu 74HC138 (ou uma porta extra) do lado de fora. Se preferir manter CS 
+único, dá pra fazer, mas complica a PIO — me avisa se quiser essa variante.
+4. Ainda não tratei o registrador **Device/Head** pra multi-dispositivo (seleção master/
+slave) nem comandos além de READ/WRITE SECTORS — deixei só o essencial pro MIDE reconhecer 
+o disco e transferir dados; dá pra estender `dispatch_command()` conforme for precisando 
+(IDENTIFY DEVICE, por exemplo, vai ser necessário pro MIDE detectar o disco).
+
+
+Duas coisas separadas, e nenhuma delas o código resolve sozinho:
+
+**1. Roda em SRAM?** Não, do jeito que está. Nada no `.c` ou no `.pio` decide onde o binário
+ é linkado/executado — isso é configuração de build, não de código-fonte. Por padrão, um 
+ executável Pico SDK roda em XIP direto da flash. Pra forçar execução 100% em SRAM (o que 
+ fecha com a decisão de projeto de não competir com a PSRAM no QSPI), você adiciona no 
+ `CMakeLists.txt`:
+
+```cmake
+pico_set_binary_type(seu_alvo copy_to_ram)
+```
+
+Isso funciona tanto em RP2040 quanto RP2350 — copia a imagem inteira pra RAM no boot e executa
+ de lá (ainda inicializa via flash, só não fica em XIP depois). Único detalhe: uma função 
+ minúscula do runtime (`__get_current_exception`) fica fisicamente na flash mesmo com 
+ `copy_to_ram`, por estar numa seção especial (`.reset`) que o SDK não copia — é inofensivo, 
+ só um fato a saber, não afeta seu caso de uso.
+
+**2. Usa algum core depois da inicialização?** Também não, como entreguei. Eu só *sugeri* em 
+comentário rodar `ide_interface_task()` no core1 — mas não escrevi o lançamento de fato. Se você 
+chamar `ide_interface_init()` e depois `ide_interface_task()` num loop dentro do `main()`, tudo 
+roda no core0 só (inclusive as ISRs, já que foram registradas a partir de onde 
+`ide_interface_init()` rodou).
+
+Já que essa era a intenção mesmo, deixa eu fechar essa lacuna agora:Atualizei os dois arquivos:
+adicionei `ide_interface_core1_entry()` (novo, no `ide_interface.h`/`.c`), que roda o loop de 
+`ide_interface_task()` de verdade. No seu `main()`, fica assim:
+
+```c
+ide_interface_init();
+multicore_launch_core1(ide_interface_core1_entry);
+```
+
+E lembre de linkar `pico_multicore` no `CMakeLists.txt` (`target_link_libraries(seu_alvo 
+pico_multicore ...)`). Com isso: core0 fica só com as ISRs de barramento (bem determinísticas, 
+tempo curto), core1 fica só bloqueando em SD, e nenhum dos dois atrapalha o outro.
+
+
+Sistema completo: CMakeLists.txt, pico_sdk_import.cmake, main.c, ide_config.h, ide_pio.pio, 
+ide_interface.h/.c.
+
+O main.c inicializa a PSRAM (via hardware_psram, com fallback pra SRAM se ela não for detectada 
+— assim dá pra testar a lógica de barramento antes da PSRAM estar validada no scope), sobe o SD, 
+chama ide_interface_init() no core0 e lança ide_interface_core1_entry no core1.
+
+O que ainda falta pra compilar de verdade, e é seu:
+
+your_sd_driver_init/read_block/write_block — declarei só a assinatura em main.c; implemente num 
+sd_driver.c ligando no seu cartão SD real.
+Confirmar o nome do header/funções de hardware_psram na versão do pico-sdk que você tem instalada 
+(é lib nova, pico-sdk 2.3+) — se a sua for mais antiga, essa parte precisa trocar por chamadas do 
+seu próprio driver de PSRAM.
+Ajustar PICO_BOARD no CMakeLists.txt pro seu hardware real (é placeholder genérico pico2 agora).
+
+Fora isso, os pontos que já tinha te avisado antes continuam de pé antes de ligar no barramento 
+físico: validar a ordem de bits da captura combinada endereço+dado com analisador lógico, e 
+confirmar que o /CS sai desmembrado em PIN_CS_DATA/PIN_CS_TASKFILE do seu decodificador.
+
+Pronto: sd_driver.c (novo), com os pinos de SPI adicionados em ide_config.h (ajuste PIN_SD_SPI_* 
+pro seu roteamento) e as duas atualizações no CMakeLists.txt (fonte nova + hardware_spi).
+
+Implementa o protocolo clássico SD em modo SPI: CMD0 → CMD8 (detecta SDv2) → CMD55+ACMD41 em loop 
+até sair do idle → CMD58 (detecta SDHC/SDXC pro endereçamento certo) → CMD17/CMD24 pra ler/escrever 
+blocos de 512 bytes.
+
+Isso é código nunca testado em hardware real — segue a especificação corretamente até onde sei, mas 
+SD em SPI tem detalhes que só aparecem na bancada (timing, se o cartão aceita o clock inicial baixo, 
+se é SDHC ou SDSC de fato). Sugiro testar isolado antes de plugar no resto: escreva um main.c de 
+teste temporário que só chama your_sd_driver_init() e depois your_sd_driver_read_block(0, buf), 
+imprime os 512 bytes por USB serial e confere se bate com o setor 0 do cartão (dá pra comparar com 
+dd if=/dev/sdX bs=512 count=1 | xxd no Linux). Só depois disso funcionando ligue no resto do sistema
+— é o mesmo método que você já usa no oriondos pra isolar bug de hardware vs. software.
+
+
+IDE1
+IDE_REG_DATA           = 0, 0xFE0000
+IDE_REG_ERROR_FEATURES = 1, 0xFE0000 (1 * 2)+1 = 0xFE0003
+IDE_REG_SECTOR_COUNT   = 2, 0xFE0000 (2 * 2)+1 = 0xFE0005
+IDE_REG_LBA_LOW        = 3, 0xFE0000 (3 * 2)+1 = 0xFE0007
+IDE_REG_LBA_MID        = 4, 0xFE0000 (4 * 2)+1 = 0xFE0009
+IDE_REG_LBA_HIGH       = 5, 0xFE0000 (5 * 2)+1 = 0xFE000B
+IDE_REG_DEVICE_HEAD    = 6, 0xFE0000 (6 * 2)+1 = 0xFE000D
+IDE_REG_STATUS_CMD     = 7, 0xFE0000 (7 * 2)+1 = 0xFE000F
+
+IDE2
+IDE_REG_DATA           = 0, 0xFE0010
+IDE_REG_ERROR_FEATURES = 1, 0xFE0010 (1 * 2)+1 = 0xFE0013
+IDE_REG_SECTOR_COUNT   = 2, 0xFE0010 (2 * 2)+1 = 0xFE0015
+IDE_REG_LBA_LOW        = 3, 0xFE0010 (3 * 2)+1 = 0xFE0017
+IDE_REG_LBA_MID        = 4, 0xFE0010 (4 * 2)+1 = 0xFE0019
+IDE_REG_LBA_HIGH       = 5, 0xFE0010 (5 * 2)+1 = 0xFE001B
+IDE_REG_DEVICE_HEAD    = 6, 0xFE0010 (6 * 2)+1 = 0xFE001D
+IDE_REG_STATUS_CMD     = 7, 0xFE0010 (7 * 2)+1 = 0xFE001F
+
+
+Vou montar as equações com base no mapa de endereços que você passou, mas encontrei um ponto que os pinos declarados não resolvem sozinhos: para diferenciar o PicoIDE (0xFE0000-0xFE000F) do MIDE IDE (0xFE0010-0xFE001F) é preciso o bit A4, que não está na lista de pinos (só há A19-A16). Vou assumir que um dos NC (pino 7) vira A4 — se estiver errado, é só me dizer qual sinal real deveria entrar aí.
+
+Minha leitura da lógica:
+- **/IOCS + A19·A18·A17·/A16** = "estamos na página 0xFE" (assumindo que A16-A19 chegam ao GAL para refinar o /IOCS vindo de outro decodificador)
+- **/CSDATA** = registrador DATA do PicoIDE → acesso de **word** (UDS e LDS ativos juntos), A4=0
+- **/CSTASKFILE** = demais registradores do PicoIDE → acesso de **byte ímpar** (só LDS ativo, UDS inativo), A4=0
+- **/CSIDE** = OR de CSDATA/CSTASKFILE → simplifica para "/LDS ativo" dentro do bloco A4=0 (já que LDS está sempre ativo nos dois casos)
+- **/CSIDE2** = bloco inteiro do MIDE IDE (A4=1), sem separar DATA/TASKFILE — assumi que essa placa faz sua própria decodificação interna de registrador via A1-A3 direto
+- **/RD** e **/WR** — pelos seus comentários, são só para o MIDE IDE (A4=1), gerados a partir de CPURW
+- **/DS** = "pronto" combinado, ativo quando qualquer um dos dois blocos é endereçado (independe de A4)
+
+Deixe-me testar a sintaxe no Galette antes de te entregar o arquivo.Rust instalado com sucesso. Agora vou tentar buscar e compilar o Galette.Ótimo, compilou. Agora vou escrever o `.pld` e testar a montagem real.Achei exemplos reais. Vou ver um deles (GAL22V10 se houver, ou um combinacional).Compilou sem erros. Ele gerou o JEDEC também — vou conferir.Fusível gerado com sucesso — a sintaxe está validada e o arquivo monta corretamente com o Galette (compatível com GALasm também, já que usam o mesmo formato). Vou copiar o `.pld` para os arquivos de saída.Testei a montagem de verdade com o Galette (mesma sintaxe do GALasm) e compilou sem erro, gerando o `.jed` junto.
+
+Um ponto importante para você conferir: os pinos que você listou (IOCS, A19-A16, CPURW, AS, UDS, LDS) **não dão para separar PicoIDE de MIDE IDE**, porque essa distinção no seu mapa está no bit A4 (0xFE0000 vs 0xFE0010), e A4 não estava entre os pinos de entrada. Usei o pino 7 (que estava NC) como A4 — se o A4 real vem de outro pino físico, me diga qual e eu ajusto.
+
+Resumo da lógica:
+- `/CSDATA` → PicoIDE, registrador DATA (word: UDS e LDS ativos juntos)
+- `/CSTASKFILE` → PicoIDE, demais registradores (byte ímpar: só LDS ativo)
+- `/CSIDE` → OR das duas acima (simplificou para `/LDS`, já que LDS está sempre ativo nos dois casos)
+- `/CSIDE2` → bloco inteiro do MIDE IDE (presumi que essa placa decodifica registrador internamente via A1-A3 ligados direto, sem precisar de CSDATA/CSTASKFILE separados)
+- `/RD` e `/WR` → só para o MIDE IDE (A4=1), como seus comentários indicavam
+- `/DS` → ack combinado, ativo para qualquer um dos dois blocos
+
+Se o A4 estiver certo e o resto bater com o hardware, é só gravar o `.jed`. Qualquer correção de pinagem, me avisa que eu recompilo já validado.

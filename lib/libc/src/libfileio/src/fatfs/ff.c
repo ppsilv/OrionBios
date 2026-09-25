@@ -3846,7 +3846,7 @@ FRESULT f_open (
 				if (mode & FA_CREATE_NEW) {
 					res = FR_EXIST;				/* Cannot create as new file */
 				} else {
-					if (dj.obj.attr & (AM_RDO | AM_DIR)) res = FR_DENIED;	/* Cannot overwrite it (R/O or DIR) */
+					if (dj.obj.attr & (AM_RDO | AM_DIR )) res = FR_DENIED;	/* Cannot overwrite it (R/O or DIR) */
 				}
 			}
 			if (res == FR_OK && (mode & FA_CREATE_ALWAYS)) {	/* Truncate the file if overwrite mode */
@@ -5411,7 +5411,7 @@ FRESULT f_chmod (
 		res = follow_path(&dj, path);	/* Follow the file path */
 		if (res == FR_OK && (dj.fn[NSFLAG] & (NS_DOT | NS_NONAME))) res = FR_INVALID_NAME;	/* Check object validity */
 		if (res == FR_OK) {
-			mask &= AM_RDO|AM_HID|AM_SYS|AM_ARC;	/* Valid attribute mask */
+			mask &= AM_DEV|AM_LNK|AM_RDO|AM_HID|AM_SYS|AM_ARC;	/* Valid attribute mask */
 #if FF_FS_EXFAT
 			if (fs->fs_type == FS_EXFAT) {
 				fs->dirbuf[XDIR_Attr] = (attr & mask) | (fs->dirbuf[XDIR_Attr] & (BYTE)~mask);	/* Apply attribute change */

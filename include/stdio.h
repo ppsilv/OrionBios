@@ -2,11 +2,6 @@
 #define STDIO_H
 
 #include <stddef.h>
-#include <stdio_internal.h>
-
-extern FILE *stdin;
-extern FILE *stdout;
-extern FILE *stderr;
 
 void putchar(char c);
 char getchar(void);

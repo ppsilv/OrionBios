@@ -22,6 +22,7 @@ uint16_t ponteiro_leitura_setor = 0;
 #define OPER_ESCRITA    0x00
 #define OPER_LEITURA    0x01
 int i=0,j=0;
+int sd_counter=0;
 
 uint32_t crc32_calculate(const uint8_t *buffer, size_t length) ;
 
@@ -121,7 +122,19 @@ void __not_in_flash_func(gerenciar_barramento_m68k)(PIO pio, uint sm){
                 break;
             case 0x15:
                 printf("Chegou aqui: %c\n",dado_m68k);
-                break;                
+                break;           
+            case 0x20:
+                if (sd0->card) /* && sd0.card->mounted) */{    // Garante que o cartão inicializou com sucesso
+                    sd0->sector = 0;
+                    // Usa o próprio buffer da estrutura:
+                    printf("Calling read blocks\n");
+                    sd0->card->read_blocks(sd0->card, sd0->buffer, sd0->sector, 1);
+                }             
+                sd_counter = 0;                    
+                break;
+            case 0x21:
+                byte_resposta = sd0->buffer[sd_counter++];
+                break;
             default:
                 byte_resposta = 0xFF;
                 break;

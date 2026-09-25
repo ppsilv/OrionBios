@@ -9,7 +9,7 @@ CFLAGS = -m68000 -fPIC -msep-data -Wall -O0 -ffreestanding -nostdlib -I../../inc
 ARFLAGS = rcs
 
 # Diretórios
-SRC_DIR = src
+SRC_DIR = ../libc/src
 OBJ_DIR = obj
 LIB_DIR = ../../lib
 INC_DIR = include

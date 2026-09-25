@@ -1,0 +1,21 @@
+   1               	#NO_APP
+   2               		.file	"dummy.c"
+   3               		.text
+   4               		.align	2
+   5               		.globl	get_tick_count
+   7               	get_tick_count:
+   8 0000 4E56 0000 		link.w %fp,#0
+   9 0004 7000      		moveq #0,%d0
+  10 0006 4E5E      		unlk %fp
+  11 0008 4E75      		rts
+  13               		.align	2
+  14               		.globl	duart_a_send_char
+  16               	duart_a_send_char:
+  17 000a 4E56 FFFC 		link.w %fp,#-4
+  18 000e 202E 0008 		move.l 8(%fp),%d0
+  19 0012 1000      		move.b %d0,%d0
+  20 0014 1D40 FFFE 		move.b %d0,-2(%fp)
+  21 0018 4E71      		nop
+  22 001a 4E5E      		unlk %fp
+  23 001c 4E75      		rts
+  25               		.ident	"GCC: (GNU) 15.1.0"

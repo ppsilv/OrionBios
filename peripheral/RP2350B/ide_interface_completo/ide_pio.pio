@@ -1,0 +1,100 @@
+;
+; ide_pio.pio
+;
+; Interface de barramento m68k <-> RP2350B, emulando um disco IDE/ATA.
+;
+; Duas state machines independentes:
+;
+;   ide_data      -> caminho RAPIDO: registrador Data (16 bit).
+;                    TX FIFO alimentado por DMA (leitura), RX FIFO
+;                    drenado por DMA (escrita) — sem intervencao da
+;                    CPU durante uma rajada de setor.
+;
+;   ide_taskfile  -> caminho LENTO: os outros 7 registradores.
+;                    So sinaliza a CPU via IRQ; quem decide o valor/efeito
+;                    e o codigo C (shadow registers).
+;
+; PREMISSAS (ver ide_config.h):
+;   - /CS ja vem desmembrado externamente em PIN_CS_DATA e PIN_CS_TASKFILE
+;     (uma saida a mais no seu decodificador), entao cada SM so responde
+;     ao seu proprio CS — nao precisamos decodificar endereco dentro da
+;     PIO so pra escolher a SM.
+;   - D0..D15 (PIN_DBUS_BASE) e A1..A3 (PIN_AREG_BASE) sao contiguos no
+;     mapa de GPIO, nessa ordem, para permitir capturar endereco+dado
+;     numa unica "in pins, N".
+;   - "mov pindirs, ~null" / "mov pindirs, null" vira o barramento de
+;     dados entre entrada e saida.
+;   - Sem timeout automatico de /DTACK na placa (confirmado).
+;
+; ATENCAO: a ORDEM dos bits dentro do ISR depende da configuracao de
+; shift (direita/esquerda) escolhida no lado C. O codigo em
+; ide_interface.c assume shift-right — confirme com um analisador
+; logico antes de operar isso no barramento real.
+;
+
+.program ide_data
+.side_set 1 opt                 ; side bit 0 = /DTACK (0 = assert, 1 = deassert)
+
+.wrap_target
+wait_sel:
+    wait 0 gpio 19               ; PIN_CS_DATA asserted
+    wait 0 gpio 21               ; PIN_DS asserted
+    jmp  pin, do_read            ; jmp-pin configurado para PIN_RW (1 = leitura)
+
+do_write:
+    mov  pindirs, null           ; barramento de dados como entrada
+    in   pins, 16                 ; captura os 16 bits de dados (base = PIN_DBUS_BASE)
+    push                           ; -> RX FIFO (drenado por DMA_C)
+    nop             side 0        ; assert /DTACK
+    wait 1 gpio 21                 ; espera DS ser liberado (fim do ciclo)
+    nop             side 1        ; deassert /DTACK
+    jmp wait_sel
+
+do_read:
+    mov  pindirs, ~null           ; barramento de dados como saida
+    pull                            ; <- TX FIFO (alimentado por DMA_B)
+    out  pins, 16
+    nop             side 0        ; assert /DTACK
+    wait 1 gpio 21
+    nop             side 1        ; deassert /DTACK
+    mov  pindirs, null             ; libera o barramento de novo
+    jmp wait_sel
+.wrap
+
+
+.program ide_taskfile
+.side_set 1 opt                 ; side bit 0 = /DTACK
+
+.wrap_target
+wait_sel:
+    wait 0 gpio 20                ; PIN_CS_TASKFILE asserted
+    wait 0 gpio 21                ; PIN_DS asserted
+    jmp  pin, do_read
+
+do_write:
+    ; base de IN = PIN_DBUS_BASE, span cobrindo D0..D15 + A1..A3 (19 pinos).
+    ; So os 3 bits de endereco e os 8 bits baixos de dado interessam aqui,
+    ; mas capturamos a janela toda numa tacada so; o core descarta o resto.
+    in   pins, 19
+    push                            ; -> RX FIFO: {addr, dado} combinados
+    irq  set 0                      ; avisa a CPU: escrita pendente no shadow reg
+    nop             side 0
+    wait 1 gpio 21
+    nop             side 1
+    jmp wait_sel
+
+do_read:
+    ; usa a MESMA janela de captura de 19 bits do caminho de escrita
+    ; (base fixo da SM = PIN_DBUS_BASE) — os 16 bits baixos vem do
+    ; barramento de dados flutuando (ninguem o dirige numa leitura) e
+    ; sao descartados no lado C; so os 3 bits de endereco importam aqui.
+    in   pins, 19
+    push                              ; core le a FIFO pra saber qual registrador
+    irq  set 1                        ; avisa a CPU: leitura pedida
+    pull                               ; bloqueia ate o core empurrar o valor certo
+    out  pins, 8
+    nop             side 0
+    wait 1 gpio 21
+    nop             side 1
+    jmp wait_sel
+.wrap
