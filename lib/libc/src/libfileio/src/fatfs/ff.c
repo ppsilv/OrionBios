@@ -4725,7 +4725,7 @@ FRESULT f_opendir (
 	FATFS *fs;
 	DEF_NAMEBUFF
 
-
+	//printf("F_opendir:...\n");
 	if (!dp) return FR_INVALID_OBJECT;	/* Reject null pointer */
 
 	res = mount_volume(&path, &fs, 0);	/* Get logical drive and mount the volume if needed */

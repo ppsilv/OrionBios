@@ -5,7 +5,7 @@ LD = m68k-elf-ld
 OBJCOPY = m68k-elf-objcopy
 
 # Flags
-CFLAGS = -Wall -Os -ffreestanding -nostdlib -I../../include
+CFLAGS = -Wall -O0 -ffreestanding -nostdlib -I../../include
 ARFLAGS = rcs
 
 # Diretórios

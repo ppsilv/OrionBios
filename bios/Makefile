@@ -25,12 +25,11 @@ VASMS =
 SRCS = bios68.c timers.c interrupt.c \
 ./dump/mem_dump.c \
 ./shell/vid_ram_bios.c \
-./shell/elf_loader.c \
 ./shell/printerro.c \
 ./shell/commands.c \
 ./shell/shell.c \
-./shell/crc32.c \
 ./shell/shell_history.c \
+./shell/receiver.c \
 ./sys/traps/trap12.c \
 ./sys/vectors/vectors.c \
 ./sys/vectors/jumptable.c \
@@ -47,6 +46,9 @@ SRCS = bios68.c timers.c interrupt.c \
 
 #./tst_fat/tstfat.c
 #./picoVga/drv_picoVga.c \
+#./shell/elf_loader.c \
+#./shell/crc32.c \
+
 
 # 2. ALTERADO: Agora a lista de objetos junta os .o vindos do .c e do .S
 OBJS = $(SRCS:.c=.o) $(ASMS:.S=.o) $(VASMS:.asm=.o)

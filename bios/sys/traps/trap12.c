@@ -69,6 +69,7 @@ void do_findnext(int argc, char *argv[]) {
  * ========================================================================= */
 
 void do_opendir(int argc, char *argv[]) {
+    //printf("do_opendir...\n");
     f_opendir((DIR *)argv[0], (const char *)argv[1]);
 }
 

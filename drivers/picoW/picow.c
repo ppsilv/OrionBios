@@ -34,6 +34,7 @@ extern void video_puts(const char *s);
  * @return uint16_t O tamanho do arquivo recebido (0 se não houver arquivo)
  */
  extern void _delay_ms();
+ /*
 bool receber_arquivo_do_pico(uint8_t *destino_ram, uint8_t preg) {
     volatile uint8_t *reg = (volatile uint8_t *)(0xFF9100 + preg);
     printf("reg=[%08X]\n",reg);
@@ -129,7 +130,7 @@ bool noblk_receber_arquivo_do_pico(uint8_t *destino_ram, uint8_t preg) {
     }
     return arq_crc_rec == arq_crc;
 }
-
+*/
 //#define SECTOR_LOW_REG         0x0A
 //#define SECTOR_HIGH_REG        0x0B
 //#define SECTOR_SEC_LOAD_REG    0x0C
@@ -183,7 +184,7 @@ uint32_t get_crc(){
     return arq_crc_rec;
 }
 
-
+/*
 bool receber_setor_do_pico(uint8_t *destino_ram, uint16_t sector) {
 
     printf("Sending low register value\n");
@@ -213,7 +214,7 @@ bool receber_setor_do_pico(uint8_t *destino_ram, uint16_t sector) {
 
     return arq_crc_rec == arq_crc;
 }
-
+*/
 
 void pico_write_ch(uint8_t ch){
     PICO_WRITE_CH = ch;    

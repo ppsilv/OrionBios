@@ -114,7 +114,7 @@ f_open(&file, "1:/arquivo2.txt", FA_READ);  // Usa o drive 1
 void do_ideinit(int argc, char *argv[])
 {
     FRESULT fr;
-    fr = f_mount(&FatFs, "0:/", 0);
+    fr = f_mount(&FatFs, "", 0);
     if (fr != FR_OK) {
         printf("ERROR: Erro ao montar FAT No disks available ");
     }else{
@@ -168,7 +168,7 @@ void main() {
    // printf("    * duart B\n");
    // duart_init_canal_a();
     
-    crc32_init();
+   //crc32_init();
 #ifdef DEBUG_ON
     ata_read_identity();    
 #endif

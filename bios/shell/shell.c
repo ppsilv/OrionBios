@@ -78,7 +78,7 @@ const cmd_entry_t g_cmd_table[] = {
     {"writemem1",   2,  0, &do_writemem1,   "Write a memory location" },
 //    {"int2on",      0,  0, &do_int2ON,      "Turn on int3" },
 //    {"ascii",       0,  0, &do_ascii,       "Print hex code of keyboard key" },
-//    {"receiver",    0,  0, &do_receiver,    "Receiver a file and save to disk" },
+    {"recv",        0,  0, &do_receiver,    "Receiver a file and save to disk" },
 
     {0, 0, 0, 0, 0 }
 };
@@ -201,9 +201,9 @@ int load_elf_executable(int argc, char *argv[], FIL *fd)
                 return -1;
 
             case PT_LOAD:
-#ifdef DEBUG_ELF    
+//#ifdef DEBUG_ELF    
 				printf("Loading %d byte segment from offset 0x%x to address 0x%x\n\r",	progHeader.filesz, progHeader.offset, progHeader.paddr);
-#endif                
+//#endif                
                 f_lseek(fd, progHeader.offset);
 
                 if(f_read(fd, (char*)progHeader.paddr, progHeader.filesz, &bytesRead) != FR_OK || bytesRead != progHeader.filesz)

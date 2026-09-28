@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdint.h>
 #include <trap12.h>
 #include "fatfs/ff.h"
@@ -179,6 +180,7 @@ FRESULT fstat(const TCHAR* path, FILINFO* fno) {
  * ========================================================================= */
 
 FRESULT fopendir(DIR* dp, const TCHAR* path) {
+    //printf("fileio:fopendir\n");
     register uint32_t res    __asm__("d0");
     register uint32_t cmd    __asm__("d1") = SYS_FOPENDIR;
     register void*    arg_a0 __asm__("a0") = (void*)dp;

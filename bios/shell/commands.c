@@ -30,8 +30,8 @@ extern FATFS FatFs;      // Objeto de controle do sistema de arquivos (Work area
 extern char syspath[128];
 extern void main_teste_teclado(void); 
 extern char teste01();
-extern bool receber_arquivo_do_pico(uint8_t *destino_ram,uint8_t reg);
-extern bool noblk_receber_arquivo_do_pico(uint8_t *destino_ram, uint8_t preg);
+//extern bool receber_arquivo_do_pico(uint8_t *destino_ram,uint8_t reg);
+//extern bool noblk_receber_arquivo_do_pico(uint8_t *destino_ram, uint8_t preg);
 extern bool receber_setor_do_pico(uint8_t *destino_ram, uint16_t sector);
 extern void pico_write_ch(uint8_t ch);
 
@@ -616,7 +616,7 @@ char path[128];
         printf("Remove error: %d\n", res);
     }    
 }
-
+/*
 void do_runelf_fromhd(int argc, char *argv[]){
     const char *filename = argv[0] ;
     uint32_t entry = carregar_elf32_fatfs(filename);
@@ -629,7 +629,6 @@ void do_runelf_fromhd(int argc, char *argv[]){
         // Tratar erro (arquivo não encontrado ou desalinhado)
     }
 }
-
 void do_runelf(int argc, char *argv[]){
     // Retorna o endereço da primeira instrução
     uint8_t * buffer_elf_recebido = (uint8_t * )argv[0];
@@ -642,6 +641,7 @@ void do_runelf(int argc, char *argv[]){
         executar();
     }
 }
+*/
 void do_run(int argc, char *argv[])
 {
     unsigned long start;
@@ -708,6 +708,7 @@ void do_run(int argc, char *argv[])
            nome_arquivo, (unsigned)tamanho);
 }
 extern void video_puts(const char *s);
+/*
 void do_save2(int argc, char *argv[]){
     uint8_t status=0;
     status = PICO_STATUS_REG;
@@ -778,7 +779,7 @@ void do_save2(int argc, char *argv[]){
     ring_buf_put(0x0D);
     //printf("dump_memoria_para_arquivo: '%s' gravado com sucesso (%u bytes)\n",nome_arquivo, (unsigned)tamanho);
 }
-
+*/
 
 char do_save_basic(int argc, char *argv[]){
     FIL     arquivo;
@@ -851,6 +852,7 @@ void do_time(int argc, char *argv[])
     printf("Setting the date and time to %02d/%02d/%04d %02d:%02d:%02d\n", date.tm_day, date.tm_mon, date.tm_year, date.tm_hour, date.tm_min, date.tm_sec);
   //  rtc_set_time(&date);
 }
+/*
 void do_tstkbd(int argc, char *argv[])
 {
     uint8_t cmd =(uint8_t ) strtoul((const char *)argv[0], NULL, 16);
@@ -905,6 +907,7 @@ void do_tstkbd(int argc, char *argv[])
                     printf("receber_arquivo_do_pico retornou[Error]\n"); 
     }
 }
+*/
 
 unsigned long get_system_tick(void) ;
 void do_uptime(int argc, char *argv[])

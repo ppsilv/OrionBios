@@ -169,7 +169,7 @@ static int list_dir(const char *path, int show_hidden, int wide)
 static void ideinit()
 {
     FRESULT fr;
-    fr = fmount(&FatFs, "", 0);
+    fr = fmount(&FatFs, "0:/", 0);
     if (fr != FR_OK) {
         printf("PANIC: Erro ao montar FAT\n");
     } else {
@@ -190,6 +190,9 @@ int main(int argc, char *argv[])
     int show_hidden = 0;
     int wide = 0;
     int i;
+
+    printf("argc[%d]\n",argc);
+
     for (i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-h") == 0) {
             help();
@@ -206,5 +209,6 @@ int main(int argc, char *argv[])
     if (!wide) {
         printf("DLRHSA  %s  Nome\n", "Tamanho");
     }
+    
     return list_dir(path, show_hidden, wide);
 }
