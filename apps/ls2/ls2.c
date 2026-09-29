@@ -212,3 +212,25 @@ int main(int argc, char *argv[])
     
     return list_dir(path, show_hidden, wide);
 }
+
+/*
+IDE1 = picoide
+IDE_REG_DATA           = 0, 0xFF4000
+IDE_REG_ERROR_FEATURES = 1, 0xFF4000 (1 * 2)+1 = 0xFF4003
+IDE_REG_SECTOR_COUNT   = 2, 0xFF4000 (2 * 2)+1 = 0xFF4005
+IDE_REG_LBA_LOW        = 3, 0xFF4000 (3 * 2)+1 = 0xFF4007
+IDE_REG_LBA_MID        = 4, 0xFF4000 (4 * 2)+1 = 0xFF4009
+IDE_REG_LBA_HIGH       = 5, 0xFF4000 (5 * 2)+1 = 0xFF400B
+IDE_REG_DEVICE_HEAD    = 6, 0xFF4000 (6 * 2)+1 = 0xFF400D
+IDE_REG_STATUS_CMD     = 7, 0xFF4000 (7 * 2)+1 = 0xFF400F
+
+IDE2 = MIDEIDE
+IDE_REG_DATA           = 0, 0xFF4400
+IDE_REG_ERROR_FEATURES = 1, 0xFF4400 (1 * 2)+1 = 0xFF4403
+IDE_REG_SECTOR_COUNT   = 2, 0xFF4400 (2 * 2)+1 = 0xFF4405
+IDE_REG_LBA_LOW        = 3, 0xFF4400 (3 * 2)+1 = 0xFF4407
+IDE_REG_LBA_MID        = 4, 0xFF4400 (4 * 2)+1 = 0xFF4409
+IDE_REG_LBA_HIGH       = 5, 0xFF4400 (5 * 2)+1 = 0xFF440B
+IDE_REG_DEVICE_HEAD    = 6, 0xFF4400 (6 * 2)+1 = 0xFF440D
+IDE_REG_STATUS_CMD     = 7, 0xFF4400 (7 * 2)+1 = 0xFF440F
+*/
