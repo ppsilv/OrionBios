@@ -1,0 +1,65 @@
+;
+; ide_pio.pio  (v3 - compacto: 12 + 16 = 28 instrucoes, cabe nas 32 do PIO)
+;
+; v2 tinha 19 + 22 = 41 instrucoes e o segundo pio_add_program falhava (-9).
+;
+; Pinos (ide_config.h): CS_DATA=22, CS_TASKFILE=23, DS=24, RW=25,
+; DTACK=26 (side-set: 0 = assertado, 1 = solto).
+;
+; O nivel inicial do /DTACK (alto) e forcado pelo C ANTES de o pino virar
+; saida (pio_sm_set_pins_with_mask), por isso nao ha mais "nop side 1" no
+; inicio. O side-set agora vai junto das instrucoes de trabalho.
+;
+; Shift de entrada no C: para a ESQUERDA nas duas SMs (autopush desligado).
+;
+
+.program ide_data
+.side_set 1 opt
+
+.wrap_target
+wait_sel:
+    wait 0 gpio 22                ; CS_DATA assertado
+    wait 0 gpio 24                ; DS assertado
+    jmp  pin, do_read             ; RW = 1 -> leitura pelo m68k
+
+do_write:
+    in   pins, 16                 ; captura D0..D15
+    push side 0                   ; -> RX FIFO (DMA_C) e assert /DTACK
+    wait 1 gpio 24                ; espera DS ser liberado
+    jmp  wait_sel side 1          ; solta /DTACK
+
+do_read:
+    pull                          ; <- TX FIFO (DMA_B)
+    out  pins, 16                 ; valor nos pinos...
+    mov  pindirs, ~null side 0    ; ...e so entao habilita a saida; assert /DTACK
+    wait 1 gpio 24                ; espera DS ser liberado
+    mov  pindirs, null side 1     ; libera o barramento e solta /DTACK
+.wrap
+
+
+.program ide_taskfile
+.side_set 1 opt
+
+.wrap_target
+wait_sel:
+    wait 0 gpio 23                ; CS_TASKFILE assertado
+    wait 0 gpio 24                ; DS assertado
+    jmp  pin, do_read             ; RW = 1 -> leitura pelo m68k
+
+do_write:
+    in   pins, 22                 ; D0..D15 + A1..A6: dado em [7:0], endereco em [18:16]
+    push                          ; -> RX FIFO
+    irq  wait 0                   ; avisa a CPU e ESPERA a ISR atender (ela limpa o flag)
+    wait 1 gpio 24 side 0         ; assert /DTACK (ja com o registrador atualizado)
+    jmp  wait_sel side 1          ; solta /DTACK
+
+do_read:
+    in   pins, 22                 ; a ISR le o endereco na FIFO
+    push
+    irq  set 1                    ; avisa a CPU: leitura pedida
+    pull                          ; espera a ISR devolver o valor
+    out  pins, 8                  ; valor em D0..D7...
+    mov  pindirs, ~null side 0    ; ...e so entao habilita a saida; assert /DTACK
+    wait 1 gpio 24                ; espera DS ser liberado
+    mov  pindirs, null side 1     ; libera o barramento e solta /DTACK
+.wrap

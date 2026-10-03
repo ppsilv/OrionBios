@@ -1,0 +1,86 @@
+;
+; ide_pio.pio  (v2)
+;
+; Duas state machines:
+;   ide_data      -> registrador Data (16 bits), alimentado por DMA
+;   ide_taskfile  -> os outros 7 registradores, atendidos por ISR no C
+;
+; Pinos (ver ide_config.h): CS_DATA=22, CS_TASKFILE=23, DS=24, RW=25,
+; DTACK=26 (side-set, 0 = assertado, 1 = solto). Os pinos 22 a 25 sao
+; usados com numero absoluto nos "wait" e precisam ter pio_gpio_init.
+;
+; Mudancas em relacao a v1:
+;   - "nop side 1" antes do wrap_target: /DTACK comeca solto.
+;   - ide_taskfile / do_read: agora habilita D0..D7 como saida
+;     (mov pindirs, ~null) depois de colocar o valor, e solta no fim.
+;   - ide_taskfile / do_write: "irq wait 0" segura o ciclo (e o DTACK)
+;     ate a ISR atualizar o registrador-sombra e limpar o flag.
+;   - ide_data / do_read: o valor e colocado nos pinos antes de
+;     habilitar a saida.
+;
+; O shift de entrada no lado C deve ser para a ESQUERDA nas duas SMs.
+;
+
+.program ide_data
+.side_set 1 opt
+
+    nop             side 1        ; executa uma vez: /DTACK solto
+.wrap_target
+wait_sel:
+    wait 0 gpio 22                ; CS_DATA assertado
+    wait 0 gpio 24                ; DS assertado
+    jmp  pin, do_read             ; RW = 1 -> leitura pelo m68k
+
+do_write:
+    mov  pindirs, null            ; barramento de dados como entrada
+    in   pins, 16                 ; captura D0..D15
+    push                          ; -> RX FIFO (drenada pelo DMA_C)
+    nop             side 0        ; assert /DTACK
+    wait 1 gpio 24                ; espera DS ser liberado
+    nop             side 1        ; solta /DTACK
+    jmp  wait_sel
+
+do_read:
+    pull                          ; <- TX FIFO (alimentada pelo DMA_B)
+    out  pins, 16                 ; valor nos pinos...
+    mov  pindirs, ~null           ; ...e so depois habilita a saida
+    nop             side 0        ; assert /DTACK
+    wait 1 gpio 24                ; espera DS ser liberado
+    nop             side 1        ; solta /DTACK
+    mov  pindirs, null            ; libera o barramento
+    jmp  wait_sel
+.wrap
+
+
+.program ide_taskfile
+.side_set 1 opt
+
+    nop             side 1        ; executa uma vez: /DTACK solto
+.wrap_target
+wait_sel:
+    wait 0 gpio 23                ; CS_TASKFILE assertado
+    wait 0 gpio 24                ; DS assertado
+    jmp  pin, do_read             ; RW = 1 -> leitura pelo m68k
+
+do_write:
+    in   pins, 22                 ; D0..D15 + A1..A6 (dado em [7:0], endereco em [18:16])
+    push                          ; -> RX FIFO
+    irq  wait 0                   ; avisa a CPU e ESPERA ela atender (flag 0 limpo pela ISR)
+    nop             side 0        ; assert /DTACK
+    wait 1 gpio 24
+    nop             side 1        ; solta /DTACK
+    jmp  wait_sel
+
+do_read:
+    in   pins, 22                 ; o core le o endereco da FIFO
+    push
+    irq  set 1                    ; avisa a CPU: leitura pedida
+    pull                          ; bloqueia ate a ISR devolver o valor
+    out  pins, 8                  ; valor em D0..D7...
+    mov  pindirs, ~null           ; ...e so depois habilita a saida (8 pinos)
+    nop             side 0        ; assert /DTACK
+    wait 1 gpio 24
+    nop             side 1        ; solta /DTACK
+    mov  pindirs, null            ; libera o barramento
+    jmp  wait_sel
+.wrap

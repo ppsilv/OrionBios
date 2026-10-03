@@ -1,2 +1,0 @@
-/home/pdsilva/Projects/Orion/OrionBios/peripheral/RP2350B/ide_interface_completo/build/_deps/picotool-build/enc_bootloader/CMakeFiles/edit_cache.dir
-/home/pdsilva/Projects/Orion/OrionBios/peripheral/RP2350B/ide_interface_completo/build/_deps/picotool-build/enc_bootloader/CMakeFiles/rebuild_cache.dir

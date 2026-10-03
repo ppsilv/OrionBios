@@ -19,9 +19,9 @@
                           |                 |
                   CSDUART |  8           17 | NA
                           |                 |
-                       NC |  9           16 | NC
+                    CSIDE |  9           16 | NC
                           |                 |
-                       NC | 10           15 | NC
+                    DTIDE | 10           15 | NC
                           |                 |
                        NC | 11           14 | NC
                           |                 |
