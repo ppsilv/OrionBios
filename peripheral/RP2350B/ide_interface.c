@@ -84,26 +84,59 @@ static inline void set_ready_idle(void) {
 // Config dos canais de DMA usados pela SM Data (caminho rapido)
 // -----------------------------------------------------------------------
 
+//static void arm_dma_b_from_buffer(int buf_index) {
+//    // Envia 1 setor (256 words) do PSRAM para o TX FIFO da SM Data.
+//    dma_channel_config c = dma_channel_get_default_config(g_dma_b);
+//    channel_config_set_transfer_data_size(&c, DMA_SIZE_16);
+//    channel_config_set_read_increment(&c, true);
+//    channel_config_set_write_increment(&c, false);
+//    channel_config_set_dreq(&c, pio_get_dreq(g_pio, g_sm_data, true /* TX */));
+//    dma_channel_configure(
+//        g_dma_b, &c,
+//        &g_pio->txf[g_sm_data],           // destino: TX FIFO da SM Data
+//        g_buf[buf_index],                  // origem: buffer em PSRAM
+//        IDE_SECTOR_SIZE_WORDS,
+//        true                                // dispara imediatamente
+//    );
+//}
+// --- 2) DMA de leitura (SD -> buffer -> 68k) com bswap ----------------------
 static void arm_dma_b_from_buffer(int buf_index) {
-    // Envia 1 setor (256 words) do PSRAM para o TX FIFO da SM Data.
     dma_channel_config c = dma_channel_get_default_config(g_dma_b);
     channel_config_set_transfer_data_size(&c, DMA_SIZE_16);
+    channel_config_set_bswap(&c, true);                 // <-- NOVO: troca os 2 bytes de cada word
     channel_config_set_read_increment(&c, true);
     channel_config_set_write_increment(&c, false);
     channel_config_set_dreq(&c, pio_get_dreq(g_pio, g_sm_data, true /* TX */));
     dma_channel_configure(
         g_dma_b, &c,
-        &g_pio->txf[g_sm_data],           // destino: TX FIFO da SM Data
-        g_buf[buf_index],                  // origem: buffer em PSRAM
+        &g_pio->txf[g_sm_data],
+        g_buf[buf_index],
         IDE_SECTOR_SIZE_WORDS,
-        true                                // dispara imediatamente
+        true
     );
 }
 
+//static void arm_dma_c_into_buffer(int buf_index) {
+//    // Recebe 1 setor (256 words) do RX FIFO da SM Data para o PSRAM.
+//    dma_channel_config c = dma_channel_get_default_config(g_dma_c);
+//    channel_config_set_transfer_data_size(&c, DMA_SIZE_16);
+//    channel_config_set_read_increment(&c, false);
+//    channel_config_set_write_increment(&c, true);
+//    channel_config_set_dreq(&c, pio_get_dreq(g_pio, g_sm_data, false /* RX */));
+//    dma_channel_configure(
+//        g_dma_c, &c,
+//        g_buf[buf_index],
+//        &g_pio->rxf[g_sm_data],
+//        IDE_SECTOR_SIZE_WORDS,
+//        true
+//    );
+//}
+// --- 3) DMA de escrita (68k -> buffer -> SD) com bswap ----------------------
+// Precisa do MESMO bswap, senao a escrita grava o setor com os bytes trocados.
 static void arm_dma_c_into_buffer(int buf_index) {
-    // Recebe 1 setor (256 words) do RX FIFO da SM Data para o PSRAM.
     dma_channel_config c = dma_channel_get_default_config(g_dma_c);
     channel_config_set_transfer_data_size(&c, DMA_SIZE_16);
+    channel_config_set_bswap(&c, true);                 // <-- NOVO
     channel_config_set_read_increment(&c, false);
     channel_config_set_write_increment(&c, true);
     channel_config_set_dreq(&c, pio_get_dreq(g_pio, g_sm_data, false /* RX */));
@@ -115,16 +148,26 @@ static void arm_dma_c_into_buffer(int buf_index) {
         true
     );
 }
-
 // -----------------------------------------------------------------------
 // Sequencia de comando: READ SECTORS / WRITE SECTORS
 // -----------------------------------------------------------------------
 
+//static uint32_t current_lba_from_regs(void) {
+//    return ((uint32_t)g_reg_lba_high << 16) |
+//           ((uint32_t)g_reg_lba_mid  << 8)  |
+//            (uint32_t)g_reg_lba_low;
+//}
+// --- 1) LBA de 28 bits --------------------------------------------------------
+// ATA classico: LBA[7:0]=LBA Low, [15:8]=LBA Mid, [23:16]=LBA High e
+// LBA[27:24] = nibble BAIXO do registrador Device/Head.
+// (Device/Head: bit7=1, bit6=LBA, bit5=1, bit4=drive, bits3..0 = LBA[27:24])
 static uint32_t current_lba_from_regs(void) {
-    return ((uint32_t)g_reg_lba_high << 16) |
+    return ((uint32_t)(g_reg_device_head & 0x0F) << 24) |
+           ((uint32_t)g_reg_lba_high << 16) |
            ((uint32_t)g_reg_lba_mid  << 8)  |
             (uint32_t)g_reg_lba_low;
 }
+
 
 static uint16_t sector_count_from_reg(void) {
     // Convencao ATA classica: 0 no registrador significa 256 setores.
@@ -336,6 +379,31 @@ static void ide_interface_task(void) {
 // Substitua a funcao ide_interface_init() inteira no seu ide_interface.c
 // por esta. Acrescente tambem as duas variaveis static e a funcao de
 // depuracao no final (ide_interface_debug_print_pc).
+/*
+O que ainda está errado:
+
+1. Bytes trocados em cada word. O Pico é little-endian, e o primeiro byte do setor 
+    sai em D0-D7, mas o 68k espera o primeiro byte em D15-D8. A correção é 
+    channel_config_set_bswap(&c, true) nos DMAs, digo de memória, então confira no SDK. 
+    Faça nos dois, arm_dma_b_from_buffer (leitura) e arm_dma_c_into_buffer (escrita). 
+    Não escreva no cartão antes de corrigir os dois: uma escrita com os bytes trocados 
+    corrompe o sistema de arquivos. O task file (D0-D7, endereço ímpar) não é afetado.
+
+2. LBA limitado a 24 bits. A tabela de partições mostra uma partição tipo 0C (FAT32 LBA) 
+    com cerca de 62 milhões de setores, ou seja, um cartão de uns 32 GB. Com 24 bits só 
+    se alcançam 8 GB. Os bits 24 a 27 do LBA vêm do nibble baixo do registrador Device/Head 
+    (0xE0 | LBA[27:24]), e o current_lba_from_regs() os ignora. Qualquer setor acima de 8 GB 
+    leria o lugar errado. Dá para tratar no Pico em duas linhas. Meu teste também usa só 24 
+    bits e precisa do mesmo ajuste.
+
+3. Leitura de mais de um setor trava, pelo prefetch errado no dma_b_irq_handler, que apontei 
+    lá atrás. O teste não passa por isso, mas um driver de disco real vai passar.
+
+4. Falta o IDENTIFY DEVICE (0xEC), que a maioria dos drivers IDE usa primeiro. O OrionDOS 
+    pode não depender dele, mas eu não sei como o driver MIDE dele inicia.
+
+*/
+
 
 static uint g_off_data;
 static uint g_off_taskfile;

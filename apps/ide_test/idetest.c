@@ -98,7 +98,7 @@ Se o 68k congelar, me diga qual foi a última linha impressa.
                                          D7-D0. O task file usa D0-D7 do
                                          RP2350: se isso cai em D7-D0 do 68k,
                                          use 1; se cai em D15-D8, use 0.        */
-#define IDE_STAGES      3             /* roda ate esta etapa (1, 2 ou 3)        */
+#define IDE_STAGES      4             /* roda ate esta etapa (1, 2, 3 ou 4)        */
 #define TEST_LBA        0UL           /* setor a ler (< 0x1000000)              */
 #define TIMEOUT         500000UL      /* iteracoes de polling                   */
 #define SETTLE_LOOPS    300           /* pausa apos cada escrita (ver abaixo)   */
@@ -238,10 +238,10 @@ static int read_sector(uint32_t lba, uint16_t *dst) {
     uint8_t  s = 0;
     uint32_t t;
 
-    lba &= 0xFFFFFFUL;                       /* o Pico usa so 24 bits */
+     lba &= 0x0FFFFFFFUL;                        /* o Pico usa so 28 bits */
 
     printf("    programando registradores... ");
-    wr(R_DEVHEAD,  0xE0);                    /* LBA, drive 0 */
+    wr(R_DEVHEAD,  0xE0 | ((lba >> 24) & 0x0F));   // LBA[27:24]
     wr(R_COUNT,    1);
     wr(R_LBA_LOW,  (uint8_t)(lba));
     wr(R_LBA_MID,  (uint8_t)(lba >> 8));
@@ -314,14 +314,29 @@ static int stage3_read(void) {
         }
     }
     printf("    as duas leituras sao identicas"); crlf();
+   
     return 1;
 }
+
+static int stage4_lba28(void) {
+    printf("[4] fronteira de 8 GB: LBA 0x01000000 contra LBA 0\n");
+    if (!read_sector(0x01000000UL, sector_b)) return 0;
+    for (int i = 0; i < 256; i++) {
+        if (sector_a[i] != sector_b[i]) {
+            printf("    setores diferentes: LBA de 28 bits funcionando\n");
+            return 1;
+        }
+    }
+    printf("    IDENTICOS: o Pico ainda trunca o LBA em 24 bits\n");
+    return 0;
+} 
 
 int main(void) {
     printf("== teste IDE/RP2350B v2 =="); crlf();
     if (!stage1_status())                         return 1;
     if (IDE_STAGES >= 2 && !stage2_regs())        return 2;
     if (IDE_STAGES >= 3 && !stage3_read())        return 3;
+    if (IDE_STAGES >= 4 && !stage4_lba28())       return 4;
     printf("fim: tudo certo"); crlf();
     return 0;
 }
