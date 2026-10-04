@@ -271,6 +271,7 @@ bool your_sd_driver_write_block(uint32_t lba, const uint8_t *src512) {
         return false;
     }
 
+    sd_xfer_byte(0xFF);
     sd_xfer_byte(DATA_TOKEN_SINGLE_BLOCK);
     for (int i = 0; i < IDE_SECTOR_SIZE_BYTES; i++) {
         sd_xfer_byte(src512[i]);

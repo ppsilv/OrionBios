@@ -186,7 +186,7 @@ int main(void) {
     // de depuracao etc.) pode entrar aqui. As ISRs de barramento ja estao
     // registradas e ativas.
     printf("main: core0 while(true)\n");
-    printf("Versao.: 2.0.0\n");
+    printf("Versao.: 2.3.0\n");
     while (true) {
         tight_loop_contents();
     }

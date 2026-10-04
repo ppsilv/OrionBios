@@ -9,7 +9,7 @@ CFLAGS = -Wall -O0 -Wa,-adhln=$(APP).lst -I$(SYS_ROOT)/include -ffreestanding -n
 LDFLAGS = -T $(SYS_ROOT)/lib/linker.ld -L$(SYS_ROOT)/lib -nostdlib
 LDLIBS = -lc68k
 
-SRCS = $(APP).c dummy.c 
+SRCS = $(APP).c dummy.c
 
 OBJS = $(SRCS:.c=.o)
 ELFS = $(SRCS:.c=.elf)

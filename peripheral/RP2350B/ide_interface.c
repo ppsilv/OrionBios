@@ -24,6 +24,12 @@
 #include "ide_config.h"
 #include "ide_interface.h"
 #include "ide_pio.pio.h"   // gerado pelo build a partir de ide_pio.pio
+#include "hardware/sync.h"     // __dmb()
+
+#ifndef IDE_ALLOW_WRITE
+#define IDE_ALLOW_WRITE 1      // 0 = WRITE SECTORS responde ERR (modo somente leitura)
+#endif
+
 
 // -----------------------------------------------------------------------
 // Estado global
@@ -79,7 +85,13 @@ static inline void clear_drq(void) {
 static inline void set_ready_idle(void) {
     g_reg_status = IDE_STATUS_DRDY; // BSY=0, DRQ=0, ERR=0
 }
-
+static void reset_data_path(void) {
+    dma_channel_abort(g_dma_b);
+    dma_channel_abort(g_dma_c);
+    dma_hw->ints0 = 1u << g_dma_b;          // limpa flags pendentes
+    dma_hw->ints1 = 1u << g_dma_c;
+    pio_sm_clear_fifos(g_pio, g_sm_data);   // descarta palavras velhas
+}
 // -----------------------------------------------------------------------
 // Config dos canais de DMA usados pela SM Data (caminho rapido)
 // -----------------------------------------------------------------------
@@ -174,7 +186,20 @@ static uint16_t sector_count_from_reg(void) {
     return g_reg_sector_count == 0 ? 256 : g_reg_sector_count;
 }
 
+//static void begin_read_sequence(void) {
+//    g_dir = DIR_READ;
+//    g_lba = current_lba_from_regs();
+//    g_remaining_sectors = sector_count_from_reg();
+//    g_active_buf = 0;
+//    g_buf_ready[0] = g_buf_ready[1] = false;
+//
+//    set_busy();
+//    g_need_fetch = true;
+//    g_fetch_buf  = 0;
+//    g_fetch_lba  = g_lba;
+//}
 static void begin_read_sequence(void) {
+    reset_data_path();
     g_dir = DIR_READ;
     g_lba = current_lba_from_regs();
     g_remaining_sectors = sector_count_from_reg();
@@ -182,37 +207,69 @@ static void begin_read_sequence(void) {
     g_buf_ready[0] = g_buf_ready[1] = false;
 
     set_busy();
+    g_fetch_buf = 0;
+    g_fetch_lba = g_lba;
+    __dmb();
     g_need_fetch = true;
-    g_fetch_buf  = 0;
-    g_fetch_lba  = g_lba;
 }
 
+//static void begin_write_sequence(void) {
+//    g_dir = DIR_WRITE;
+//    g_lba = current_lba_from_regs();
+//    g_remaining_sectors = sector_count_from_reg();
+//    g_active_buf = 0;
+//    g_buf_ready[0] = g_buf_ready[1] = false;
+//
+//    // Pronto pra aceitar o primeiro setor vindo do m68k.
+//    set_drq();
+//    arm_dma_c_into_buffer(0);
+//}
 static void begin_write_sequence(void) {
+    reset_data_path();
     g_dir = DIR_WRITE;
     g_lba = current_lba_from_regs();
     g_remaining_sectors = sector_count_from_reg();
     g_active_buf = 0;
     g_buf_ready[0] = g_buf_ready[1] = false;
 
-    // Pronto pra aceitar o primeiro setor vindo do m68k.
-    set_drq();
-    arm_dma_c_into_buffer(0);
+    arm_dma_c_into_buffer(0);               // DMA pronto ANTES do DRQ
+    set_drq();                              // o 68k ja pode transferir o 1o setor
 }
 
+//static void dispatch_command(uint8_t cmd) {
+//    switch (cmd) {
+//        case IDE_CMD_READ_SECTORS:
+//            begin_read_sequence();
+//            break;
+//        case IDE_CMD_WRITE_SECTORS:
+//            begin_write_sequence();
+//            break;
+//        default:
+//            // comando nao implementado: sinaliza erro, nao trava
+//            g_reg_status = IDE_STATUS_DRDY | IDE_STATUS_ERR;
+//            break;
+//    }
+//}
 static void dispatch_command(uint8_t cmd) {
     switch (cmd) {
         case IDE_CMD_READ_SECTORS:
             begin_read_sequence();
             break;
         case IDE_CMD_WRITE_SECTORS:
+#if IDE_ALLOW_WRITE
             begin_write_sequence();
+#else
+            g_reg_error_features = 0x04;    // ABRT
+            g_reg_status = IDE_STATUS_DRDY | IDE_STATUS_ERR;
+#endif
             break;
         default:
-            // comando nao implementado: sinaliza erro, nao trava
+            g_reg_error_features = 0x04;    // ABRT
             g_reg_status = IDE_STATUS_DRDY | IDE_STATUS_ERR;
             break;
     }
 }
+
 
 // -----------------------------------------------------------------------
 // IRQ: SM taskfile pediu atencao da CPU (leitura ou escrita de registrador)
@@ -246,10 +303,44 @@ static void pio_taskfile_write_irq_handler(void) {
     pio_interrupt_clear(g_pio, 0);
 }
 
+//static void pio_taskfile_read_irq_handler(void) {
+//    while (!pio_sm_is_rx_fifo_empty(g_pio, g_sm_taskfile)) {
+//        uint32_t raw = pio_sm_get(g_pio, g_sm_taskfile);
+//        uint8_t addr = (uint8_t)((raw >> 16) & 0x7);   // TODO: confirmar deslocamento real
+//        uint8_t value;
+//
+//        switch (addr) {
+//            case IDE_REG_ERROR_FEATURES: value = g_reg_error_features; break;
+//            case IDE_REG_SECTOR_COUNT:   value = g_reg_sector_count;   break;
+//            case IDE_REG_LBA_LOW:        value = g_reg_lba_low;        break;
+//            case IDE_REG_LBA_MID:        value = g_reg_lba_mid;        break;
+//            case IDE_REG_LBA_HIGH:       value = g_reg_lba_high;       break;
+//            case IDE_REG_DEVICE_HEAD:    value = g_reg_device_head;    break;
+//            case IDE_REG_STATUS_CMD:     value = g_reg_status;         break;
+//            default:                     value = 0xFF;                 break;
+//        }
+//        pio_sm_put(g_pio, g_sm_taskfile, value);  // libera o "pull" que estava esperando
+//    }
+//    pio_interrupt_clear(g_pio, 1);
+//}
+// ============================================================================
+// PATCH - ide_interface.c: status correto logo apos a ultima word de uma escrita
+// ============================================================================
+// O problema: depois que o 68k escreve a ultima word de um setor, o DRQ so cai
+// quando a ISR do DMA_C roda (set_busy). Se o 68k ler o status antes disso,
+// ve 0x48 (DRQ ainda alto) e pode achar que o Pico quer mais dados.
+//
+// A solucao: quando o 68k LE o status, o Pico confere se o DMA_C ja terminou o
+// setor. Se terminou (canal nao esta mais ocupado) mas a ISR ainda nao rodou,
+// o status ja sai com BSY. Assim o 68k nunca ve DRQ "velho".
+//
+// Substitua pio_taskfile_read_irq_handler() inteira por esta versao.
+// So o case IDE_REG_STATUS_CMD mudou.
+
 static void pio_taskfile_read_irq_handler(void) {
     while (!pio_sm_is_rx_fifo_empty(g_pio, g_sm_taskfile)) {
         uint32_t raw = pio_sm_get(g_pio, g_sm_taskfile);
-        uint8_t addr = (uint8_t)((raw >> 16) & 0x7);   // TODO: confirmar deslocamento real
+        uint8_t addr = (uint8_t)((raw >> 16) & 0x7);
         uint8_t value;
 
         switch (addr) {
@@ -259,7 +350,16 @@ static void pio_taskfile_read_irq_handler(void) {
             case IDE_REG_LBA_MID:        value = g_reg_lba_mid;        break;
             case IDE_REG_LBA_HIGH:       value = g_reg_lba_high;       break;
             case IDE_REG_DEVICE_HEAD:    value = g_reg_device_head;    break;
-            case IDE_REG_STATUS_CMD:     value = g_reg_status;         break;
+            case IDE_REG_STATUS_CMD:
+                // escrita em andamento, DRQ ainda alto, mas o DMA_C ja recebeu
+                // o setor inteiro: mostra BSY ja (a ISR do DMA_C confirma depois)
+                if (g_dir == DIR_WRITE &&
+                    (g_reg_status & IDE_STATUS_DRQ) &&
+                    !dma_channel_is_busy(g_dma_c)) {
+                    set_busy();
+                }
+                value = g_reg_status;
+                break;
             default:                     value = 0xFF;                 break;
         }
         pio_sm_put(g_pio, g_sm_taskfile, value);  // libera o "pull" que estava esperando
@@ -271,10 +371,38 @@ static void pio_taskfile_read_irq_handler(void) {
 // IRQ: DMA_B terminou de mandar 1 setor pro m68k (leitura)
 // -----------------------------------------------------------------------
 
+//static void dma_b_irq_handler(void) {
+//    dma_hw->ints0 = 1u << g_dma_b; // limpa flag
+//
+//    clear_drq();
+//    g_buf_ready[g_active_buf] = false;
+//    g_lba++;
+//
+//    if (--g_remaining_sectors == 0) {
+//        set_ready_idle();
+//        g_dir = DIR_NONE;
+//        return;
+//    }
+//
+//    int next_buf = g_active_buf ^ 1;
+//    g_active_buf = next_buf;
+//
+//    if (g_buf_ready[next_buf]) {
+//        set_drq();
+//        arm_dma_b_from_buffer(next_buf);
+//    } else {
+//        set_busy();  // ainda esperando o SD — ide_interface_task() libera quando pronto
+//    }
+//
+//    // pede o proximo prefetch pro outro buffer, se ainda faltar mais setor
+//    g_need_fetch = true;
+//    g_fetch_buf  = next_buf ^ 1;
+//    g_fetch_lba  = g_lba + 1;
+//}
+// DMA_B terminou de entregar 1 setor ao 68k (leitura)
 static void dma_b_irq_handler(void) {
-    dma_hw->ints0 = 1u << g_dma_b; // limpa flag
+    dma_hw->ints0 = 1u << g_dma_b;
 
-    clear_drq();
     g_buf_ready[g_active_buf] = false;
     g_lba++;
 
@@ -284,57 +412,94 @@ static void dma_b_irq_handler(void) {
         return;
     }
 
-    int next_buf = g_active_buf ^ 1;
-    g_active_buf = next_buf;
-
-    if (g_buf_ready[next_buf]) {
-        set_drq();
-        arm_dma_b_from_buffer(next_buf);
-    } else {
-        set_busy();  // ainda esperando o SD — ide_interface_task() libera quando pronto
-    }
-
-    // pede o proximo prefetch pro outro buffer, se ainda faltar mais setor
+    // ha mais setores: BSY ate o SD entregar o proximo
+    g_active_buf ^= 1;
+    set_busy();
+    g_fetch_buf = g_active_buf;
+    g_fetch_lba = g_lba;
+    __dmb();
     g_need_fetch = true;
-    g_fetch_buf  = next_buf ^ 1;
-    g_fetch_lba  = g_lba + 1;
 }
-
 // -----------------------------------------------------------------------
 // IRQ: DMA_C terminou de receber 1 setor do m68k (escrita)
 // -----------------------------------------------------------------------
-
+//static void dma_c_irq_handler(void) {
+//    dma_hw->ints1 = 1u << g_dma_c; // limpa flag (canal C no grupo de IRQ1, ver init)
+//
+//    clear_drq();
+//    g_buf_ready[g_active_buf] = true;   // pronto pra ser gravado no SD
+//
+//    g_need_flush = true;
+//    g_flush_buf  = g_active_buf;
+//    g_flush_lba  = g_lba;
+//    g_lba++;
+//
+//    if (--g_remaining_sectors == 0) {
+//        // ultimo setor: so falta o flush, feito em ide_interface_task()
+//        return;
+//    }
+//
+//    int next_buf = g_active_buf ^ 1;
+//    g_active_buf = next_buf;
+//
+//    if (!g_buf_ready[next_buf]) {
+//        set_drq();
+//        arm_dma_c_into_buffer(next_buf);
+//    } else {
+//        set_busy(); // outro buffer ainda nao foi esvaziado (gravado no SD)
+//    }
+//}
+// DMA_C terminou de receber 1 setor do 68k (escrita)
 static void dma_c_irq_handler(void) {
-    dma_hw->ints1 = 1u << g_dma_c; // limpa flag (canal C no grupo de IRQ1, ver init)
+    dma_hw->ints1 = 1u << g_dma_c;
 
-    clear_drq();
-    g_buf_ready[g_active_buf] = true;   // pronto pra ser gravado no SD
-
-    g_need_flush = true;
-    g_flush_buf  = g_active_buf;
-    g_flush_lba  = g_lba;
-    g_lba++;
-
-    if (--g_remaining_sectors == 0) {
-        // ultimo setor: so falta o flush, feito em ide_interface_task()
-        return;
-    }
-
-    int next_buf = g_active_buf ^ 1;
-    g_active_buf = next_buf;
-
-    if (!g_buf_ready[next_buf]) {
-        set_drq();
-        arm_dma_c_into_buffer(next_buf);
-    } else {
-        set_busy(); // outro buffer ainda nao foi esvaziado (gravado no SD)
-    }
+    set_busy();                             // BSY=1, DRQ=0 ate o SD gravar
+    g_buf_ready[0] = true;
+    g_flush_buf = 0;
+    g_flush_lba = g_lba;
+    __dmb();                                // os campos acima antes do flag
+    g_need_flush = true;                    // o core1 age a partir daqui
 }
-
 // -----------------------------------------------------------------------
 // Trabalho "pesado" (bloqueante) — chamar em loop a partir de main/core1
 // -----------------------------------------------------------------------
-
+//static void ide_interface_task(void) {
+//    if (g_need_fetch) {
+//        g_need_fetch = false;
+//        int b = g_fetch_buf;
+//        uint32_t lba = g_fetch_lba;
+//
+//        if (ide_hook_sd_read_sector(lba, g_buf[b])) {
+//            g_buf_ready[b] = true;
+//            if (g_dir == DIR_READ && g_active_buf == b && (g_reg_status & IDE_STATUS_BSY)) {
+//                set_drq();
+//                arm_dma_b_from_buffer(b);
+//            }
+//        } else {
+//            g_reg_status = IDE_STATUS_DRDY | IDE_STATUS_ERR;
+//        }
+//    }
+//
+//    if (g_need_flush) {
+//        g_need_flush = false;
+//        int b = g_flush_buf;
+//        uint32_t lba = g_flush_lba;
+//
+//        if (!ide_hook_sd_write_sector(lba, g_buf[b])) {
+//            g_reg_status = IDE_STATUS_DRDY | IDE_STATUS_ERR;
+//        }
+//        g_buf_ready[b] = false; // buffer livre de novo
+//
+//        if (g_dir == DIR_WRITE && (g_reg_status & IDE_STATUS_BSY)) {
+//            set_drq();
+//            arm_dma_c_into_buffer(g_active_buf);
+//        }
+//        if (g_remaining_sectors == 0 && g_dir == DIR_WRITE) {
+//            set_ready_idle();
+//            g_dir = DIR_NONE;
+//        }
+//    }
+//}
 static void ide_interface_task(void) {
     if (g_need_fetch) {
         g_need_fetch = false;
@@ -344,11 +509,13 @@ static void ide_interface_task(void) {
         if (ide_hook_sd_read_sector(lba, g_buf[b])) {
             g_buf_ready[b] = true;
             if (g_dir == DIR_READ && g_active_buf == b && (g_reg_status & IDE_STATUS_BSY)) {
+                arm_dma_b_from_buffer(b);   // DMA antes do DRQ
                 set_drq();
-                arm_dma_b_from_buffer(b);
             }
         } else {
+            g_reg_error_features = 0x04;
             g_reg_status = IDE_STATUS_DRDY | IDE_STATUS_ERR;
+            g_dir = DIR_NONE;
         }
     }
 
@@ -357,18 +524,20 @@ static void ide_interface_task(void) {
         int b = g_flush_buf;
         uint32_t lba = g_flush_lba;
 
-        if (!ide_hook_sd_write_sector(lba, g_buf[b])) {
-            g_reg_status = IDE_STATUS_DRDY | IDE_STATUS_ERR;
-        }
-        g_buf_ready[b] = false; // buffer livre de novo
+        bool ok = ide_hook_sd_write_sector(lba, g_buf[b]);
+        g_buf_ready[b] = false;
 
-        if (g_dir == DIR_WRITE && (g_reg_status & IDE_STATUS_BSY)) {
-            set_drq();
-            arm_dma_c_into_buffer(g_active_buf);
-        }
-        if (g_remaining_sectors == 0 && g_dir == DIR_WRITE) {
-            set_ready_idle();
+        if (!ok) {
+            g_reg_error_features = 0x04;
+            g_reg_status = IDE_STATUS_DRDY | IDE_STATUS_ERR;
             g_dir = DIR_NONE;
+        } else if (--g_remaining_sectors == 0) {
+            set_ready_idle();               // so agora o 68k ve "pronto"
+            g_dir = DIR_NONE;
+        } else {
+            g_lba = lba + 1;
+            arm_dma_c_into_buffer(0);       // DMA antes do DRQ
+            set_drq();                      // proximo setor
         }
     }
 }
