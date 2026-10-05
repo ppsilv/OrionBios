@@ -235,6 +235,86 @@ static void begin_write_sequence(void) {
     arm_dma_c_into_buffer(0);               // DMA pronto ANTES do DRQ
     set_drq();                              // o 68k ja pode transferir o 1o setor
 }
+// ============================================================================
+// B) ide_interface.c  -  montagem do bloco IDENTIFY
+// ============================================================================
+#define IDE_CMD_IDENTIFY       0xEC
+#define IDE_CMD_DIAGNOSTIC     0x90
+#define IDE_CMD_INIT_PARAMS    0x91
+#define IDE_CMD_SET_FEATURES   0xEF
+#define IDE_CMD_FLUSH_CACHE    0xE7
+
+#define IDE_ID_MODEL   "picoIDE RP2350B SD"
+#define IDE_ID_SERIAL  "ORION68-0001"
+#define IDE_ID_FW      "2.3.0"
+
+static uint32_t g_sd_sectors = 0;      // capacidade real do cartao
+
+void ide_set_sd_sectors(uint32_t n) { g_sd_sectors = n; }
+
+// string ATA: 2 chars por word, o 1o no byte alto, completa com espacos
+static void id_put_string(uint16_t *w, int first_word, int n_words, const char *s) {
+    for (int i = 0; i < n_words; i++) {
+        uint8_t c0 = *s ? (uint8_t)*s++ : ' ';
+        uint8_t c1 = *s ? (uint8_t)*s++ : ' ';
+        w[first_word + i] = (uint16_t)((c0 << 8) | c1);
+    }
+}
+
+static void build_identify(uint16_t *w) {
+    uint32_t total = g_sd_sectors;
+    if (total > 0x0FFFFFFFu) total = 0x0FFFFFFFu;           // limite do LBA28
+
+    const uint32_t cyl = 16383, hd = 16, spt = 63;          // CHS "logico" padrao
+    uint32_t chs = cyl * hd * spt;
+    if (chs > total) chs = total;
+
+    for (int i = 0; i < 256; i++) w[i] = 0;
+
+    w[0]  = 0x0040;                          // disco fixo
+    w[1]  = cyl;  w[3] = hd;  w[6] = spt;
+    id_put_string(w, 10, 10, IDE_ID_SERIAL); // words 10..19 (20 chars)
+    id_put_string(w, 23, 4,  IDE_ID_FW);     // words 23..26 (8 chars)
+    id_put_string(w, 27, 20, IDE_ID_MODEL);  // words 27..46 (40 chars)
+    w[47] = 0;                               // sem READ/WRITE MULTIPLE
+    w[49] = 0x0200;                          // bit 9: LBA suportado
+    w[53] = 0x0001;                          // words 54..58 validas
+    w[54] = cyl;  w[55] = hd;  w[56] = spt;
+    w[57] = (uint16_t)(chs & 0xFFFF);
+    w[58] = (uint16_t)(chs >> 16);
+    w[60] = (uint16_t)(total & 0xFFFF);      // total de setores LBA28 (baixa)
+    w[61] = (uint16_t)(total >> 16);         //                         (alta)
+    w[80] = 0x007E;                          // ATA-1 a ATA-6
+    w[83] = 0x4000;  w[84] = 0x4000;  w[87] = 0x4000;   // bit 14 = campo valido
+
+    // word 255: assinatura 0xA5 no byte baixo; byte alto = complemento da soma
+    w[255] = 0x00A5;
+    uint8_t sum = 0;
+    const uint8_t *b = (const uint8_t *)w;
+    for (int i = 0; i < 512; i++) sum += b[i];
+    w[255] |= (uint16_t)((uint8_t)(0 - sum)) << 8;
+}
+
+static void begin_identify(void) {
+    if (g_sd_sectors == 0) {                 // capacidade desconhecida: recusa
+        g_reg_error_features = 0x04;
+        g_reg_status = IDE_STATUS_DRDY | IDE_STATUS_ERR;
+        return;
+    }
+    reset_data_path();
+    set_busy();
+    g_dir = DIR_READ;
+    g_remaining_sectors = 1;
+    g_active_buf = 0;
+    g_buf_ready[0] = g_buf_ready[1] = false;
+
+    build_identify((uint16_t *)g_buf[0]);    // g_buf e uint8_t*, alinhado em 2
+    g_buf_ready[0] = true;
+    __dmb();
+    arm_dma_b_from_buffer(0);                // DMA antes do DRQ
+    set_drq();                               // o dma_b_irq_handler fecha com 0x40
+}
+
 
 //static void dispatch_command(uint8_t cmd) {
 //    switch (cmd) {
@@ -250,27 +330,81 @@ static void begin_write_sequence(void) {
 //            break;
 //    }
 //}
+//statge 7
+//static void dispatch_command(uint8_t cmd) {
+//    switch (cmd) {
+//        case IDE_CMD_READ_SECTORS:
+//            begin_read_sequence();
+//            break;
+//        case IDE_CMD_WRITE_SECTORS:
+//#if IDE_ALLOW_WRITE
+//            begin_write_sequence();
+//#else
+//            g_reg_error_features = 0x04;    // ABRT
+//            g_reg_status = IDE_STATUS_DRDY | IDE_STATUS_ERR;
+//#endif
+//            break;
+//        default:
+//            g_reg_error_features = 0x04;    // ABRT
+//            g_reg_status = IDE_STATUS_DRDY | IDE_STATUS_ERR;
+//            break;
+//    }
+//}
+//
+// ============================================================================
+// C) ide_interface.c  -  dispatch_command completo (substitui o anterior)
+// ============================================================================
 static void dispatch_command(uint8_t cmd) {
+    // Comando novo aceito: o ATA manda limpar ERR e o registrador de erro.
+    // Sem isso, depois de um ABRT o status fica 0x41 e o proximo comando
+    // sobe o DRQ por cima do erro antigo (0x49 = DRDY+DRQ+ERR).
+    // BSY ja desde agora, para o 68k nao ler um "ocioso" velho.
+    g_reg_error_features = 0x00;
+    g_reg_status = IDE_STATUS_DRDY | IDE_STATUS_BSY;
+
     switch (cmd) {
         case IDE_CMD_READ_SECTORS:
             begin_read_sequence();
             break;
+
         case IDE_CMD_WRITE_SECTORS:
 #if IDE_ALLOW_WRITE
             begin_write_sequence();
 #else
-            g_reg_error_features = 0x04;    // ABRT
+            g_reg_error_features = 0x04;
             g_reg_status = IDE_STATUS_DRDY | IDE_STATUS_ERR;
 #endif
             break;
+
+        case IDE_CMD_IDENTIFY:
+            begin_identify();
+            break;
+
+        case IDE_CMD_DIAGNOSTIC:             // EXECUTE DEVICE DIAGNOSTIC
+            reset_data_path();
+            g_dir = DIR_NONE;
+            g_reg_error_features = 0x01;     // 0x01 = "dispositivo ok"
+            set_ready_idle();
+            break;
+
+        case IDE_CMD_INIT_PARAMS:            // INITIALIZE DEVICE PARAMETERS (CHS)
+        case IDE_CMD_SET_FEATURES:           // ex.: desligar write cache
+        case IDE_CMD_FLUSH_CACHE:            // nao ha cache: ja esta tudo no SD
+        case 0x10 ... 0x1F:                  // RECALIBRATE
+        case 0xE0: case 0xE1: case 0xE2:     // STANDBY / IDLE (nada a fazer)
+            reset_data_path();
+            g_dir = DIR_NONE;
+            g_reg_error_features = 0x00;
+            set_ready_idle();
+            break;
+
         default:
-            g_reg_error_features = 0x04;    // ABRT
+            g_reg_error_features = 0x04;     // ABRT
             g_reg_status = IDE_STATUS_DRDY | IDE_STATUS_ERR;
             break;
     }
 }
-
-
+ 
 // -----------------------------------------------------------------------
 // IRQ: SM taskfile pediu atencao da CPU (leitura ou escrita de registrador)
 // -----------------------------------------------------------------------

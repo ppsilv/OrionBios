@@ -178,6 +178,9 @@ int main(void) {
     }
     printf("picoIDE running 250 MHZ...\n");
     get_chip_id();
+    
+    ide_set_sd_sectors(sd_read_sector_count());
+
     printf("main: Calling ide_interface_init()\n");
     ide_interface_init();
     multicore_launch_core1(ide_interface_core1_entry);
@@ -186,7 +189,7 @@ int main(void) {
     // de depuracao etc.) pode entrar aqui. As ISRs de barramento ja estao
     // registradas e ativas.
     printf("main: core0 while(true)\n");
-    printf("Versao.: 2.3.0\n");
+    printf("Versao.: 2.4.0\n");
     while (true) {
         tight_loop_contents();
     }
@@ -194,91 +197,3 @@ int main(void) {
     return 0;
 }
 
-#ifdef BUCETON
-int main(void) {
-    stdio_init_all();
-
-    // 1. Aumenta a tensão do núcleo para suportar o overclock (ex: VREG_VOLTAGE_1_20V ou 1_30V)
-    vreg_set_voltage(VREG_VOLTAGE_1_30);
-    sleep_ms(2); // Dá um tempo para a tensão estabilizar
-    set_sys_clock_khz(250000, true);
-    sleep_ms(2500);
-stdio_init_all();
-for (int i = 0; i < 50 && !stdio_usb_connected(); i++) sleep_ms(100);
-sleep_ms(500);
-printf("build: %s %s\n", __DATE__, __TIME__);
-
-   qmi_hw->m[1].wfmt = 0x00001208;   // prefixo 1 bit, endereço e dados em 4 bits
-   qmi_hw->m[1].wcmd = 0x0000a038;
-
-printf("M1 timing=%08x rfmt=%08x rcmd=%08x wfmt=%08x wcmd=%08x\n",
-       qmi_hw->m[1].timing, qmi_hw->m[1].rfmt, qmi_hw->m[1].rcmd,
-       qmi_hw->m[1].wfmt, qmi_hw->m[1].wcmd);
-
-
-gpio_set_function(47,GPIO_FUNC_XIP_CS1); // Diz para o sistema que a PSRAM está em GPIO47
-xip_ctrl_hw->ctrl|=XIP_CTRL_WRITABLE_M1_BITS;
-
-//	    printf("RAM Test\n");
-//	    int * ram = (int *)malloc(sizeof(int) * TEST_SIZE );
-//	    runTest(ram, TEST_SIZE);
-//
-	    printf("PSRAM Test\n");
-	    int * psram = (int *)0x11000000;
-	    runTest(psram, TEST_SIZE);
-
-
-xip_cache_clean_all();     // grava as linhas sujas na PSRAM
-
-test_dma_psram();
-	    while (true) {
-	        //status_led_set_state(true);
-	        sleep_ms(DELAY);
-	        //status_led_set_state(false);
-	        sleep_ms(DELAY);
-	        printf(".");
-	    }
-
-
-
-
-
-    if (!your_sd_driver_init()) {
-        printf("Erro de inicializacao do sd_driver...\n");
-        fatal_blink();
-    }
-    printf("picoIDE running 150MHZ...\n");
-    get_chip_id();
-    printf("main: Calling ide_interface_init()\n");
-    ide_interface_init();
-    multicore_launch_core1(ide_interface_core1_entry);
-    printf("main: multicore_launch_core1 installed\n");
-    // core0 livre daqui pra frente — resto do seu firmware (rede, console
-    // de depuracao etc.) pode entrar aqui. As ISRs de barramento ja estao
-    // registradas e ativas.
-    printf("main: core0 while(true)\n");
-    while (true) {
-        tight_loop_contents();
-    }
-
-    return 0;
-}
-
-
-
-#include "pico/stdlib.h"
-#include <stdio.h>
-#include "pico_ide.h"
-
-int main(void) {
-    stdio_init_all();
-    const uint LED = 25;   // ajuste para o pino do seu LED
-    gpio_init(LED);
-    gpio_set_dir(LED, GPIO_OUT);
-    while (true) {
-        gpio_put(LED, 1); sleep_ms(100);
-        gpio_put(LED, 0); sleep_ms(900);
-        printf("vivo\n");
-    }
-}
-#endif

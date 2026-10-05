@@ -145,7 +145,7 @@ void start_irq(uint8_t new_irq){
 }
 
 void setup(){
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("Teste do gerenciador de interrupção 1.0"); 
   setup_ports();
 

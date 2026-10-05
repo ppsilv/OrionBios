@@ -295,3 +295,53 @@ bool your_sd_driver_write_block(uint32_t lba, const uint8_t *src512) {
     sd_cs_deselect();
     return true;
 }
+// ============================================================================
+// A) sd_driver.c  -  capacidade do cartao via CMD9 (le o registrador CSD)
+// ============================================================================
+ 
+// Converte os 16 bytes do CSD em numero de setores de 512 bytes (0 = invalido).
+static uint32_t csd_to_sectors(const uint8_t csd[16]) {
+    uint8_t ver = csd[0] >> 6;
+    if (ver == 1) {                                   // CSD v2 (SDHC/SDXC)
+        uint32_t c_size = ((uint32_t)(csd[7] & 0x3F) << 16) |
+                          ((uint32_t)csd[8] << 8) | csd[9];
+        return (c_size + 1) * 1024u;                  // (C_SIZE+1) * 512 KiB
+    }
+    if (ver == 0) {                                   // CSD v1 (SDSC)
+        uint32_t read_bl_len = csd[5] & 0x0F;
+        uint32_t c_size = ((uint32_t)(csd[6] & 0x03) << 10) |
+                          ((uint32_t)csd[7] << 2) | (csd[8] >> 6);
+        uint32_t mult = ((csd[9] & 0x03) << 1) | (csd[10] >> 7);
+        uint64_t bytes = (uint64_t)(c_size + 1) << (mult + 2);
+        bytes <<= read_bl_len;
+        return (uint32_t)(bytes / 512u);
+    }
+    return 0;
+}
+ 
+#ifndef CMD9
+#define CMD9 (CMD24 - 15)      // mesmo estilo de CMD24 (com ou sem o bit 0x40)
+#endif
+ 
+// Devolve a capacidade em setores de 512 bytes, ou 0 se falhar.
+uint32_t sd_read_sector_count(void) {
+    uint8_t csd[16];
+    uint32_t sectors = 0;
+ 
+    if (sd_send_command(CMD9, 0, 0x01) == 0x00) {     // R1 = 0: aceitou
+        int ok = 0;
+        for (int t = 0; t < 100000; t++) {            // espera o token 0xFE
+            if (sd_xfer_byte(0xFF) == 0xFE) { ok = 1; break; }
+        }
+        if (ok) {
+            for (int i = 0; i < 16; i++) csd[i] = sd_xfer_byte(0xFF);
+            sd_xfer_byte(0xFF);                       // CRC (ignorado)
+            sd_xfer_byte(0xFF);
+            sectors = csd_to_sectors(csd);
+        }
+    }
+    sd_cs_deselect();
+    sd_xfer_byte(0xFF);                               // 8 clocks extras
+    return sectors;
+}
+ 

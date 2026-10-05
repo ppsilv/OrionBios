@@ -193,14 +193,6 @@ static int has_master_disk2(void){
 int ata_detect(void){
 	uint8_t status;
 
-	//status = *ATA_REG_STATUS;
-	// If the busy bit is already set, or the two bits that are always 0, then perhaps nothing is connected
-	//if (status & ATA_ST_BUSY) {
-	//	return 0;   // ainda ocupado, tenta de novo depois
-	//}
-	//if (!(status & ATA_ST_DRDY)) {
-	//	return 0;   // não ocupado, mas ainda não sinalizou "pronto"
-	//}	
 	if( ! has_master_disk() ){
 		return 0;
 	}
@@ -388,9 +380,9 @@ int ata_init(void)
 	for (short i = 0; i < PARTITION_MAX; i++) {
 		if (drives[0].parts[i].size) {
 			log_notice("ata%d: found partition with %d sectors\n", i, drives[0].parts[i].size);
+			log_notice("ata%d:  %d Mb\n", i, drives[0].parts[i].size*512/1000000);
 		}
 	}
-
 	return 1;
 }
 

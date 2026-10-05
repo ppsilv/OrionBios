@@ -1,0 +1,1779 @@
+
+/home/pdsilva/.cache/arduino/sketches/9151DC625C03162522992179C55A64AF/interruptCntrl.ino.elf:     file format elf32-avr
+
+
+Disassembly of section .text:
+
+00000000 <__vectors>:
+__vectors():
+   0:	34 c0       	rjmp	.+104    	; 0x6a <__ctors_end>
+   2:	3c c2       	rjmp	.+1144   	; 0x47c <__vector_1>
+   4:	57 c0       	rjmp	.+174    	; 0xb4 <__bad_interrupt>
+   6:	30 c2       	rjmp	.+1120   	; 0x468 <__vector_3>
+   8:	55 c0       	rjmp	.+170    	; 0xb4 <__bad_interrupt>
+   a:	54 c0       	rjmp	.+168    	; 0xb4 <__bad_interrupt>
+   c:	41 c2       	rjmp	.+1154   	; 0x490 <__vector_6>
+   e:	52 c0       	rjmp	.+164    	; 0xb4 <__bad_interrupt>
+  10:	51 c0       	rjmp	.+162    	; 0xb4 <__bad_interrupt>
+  12:	89 c1       	rjmp	.+786    	; 0x326 <__vector_9>
+  14:	4f c0       	rjmp	.+158    	; 0xb4 <__bad_interrupt>
+  16:	f6 c1       	rjmp	.+1004   	; 0x404 <__vector_11>
+  18:	d0 c1       	rjmp	.+928    	; 0x3ba <__vector_12>
+  1a:	4c c0       	rjmp	.+152    	; 0xb4 <__bad_interrupt>
+  1c:	4b c0       	rjmp	.+150    	; 0xb4 <__bad_interrupt>
+  1e:	4a c0       	rjmp	.+148    	; 0xb4 <__bad_interrupt>
+  20:	49 c0       	rjmp	.+146    	; 0xb4 <__bad_interrupt>
+  22:	48 c0       	rjmp	.+144    	; 0xb4 <__bad_interrupt>
+  24:	47 c0       	rjmp	.+142    	; 0xb4 <__bad_interrupt>
+
+00000026 <__trampolines_end>:
+__trampolines_start():
+  26:	00 00       	nop
+  28:	00 00       	nop
+  2a:	38 00       	.word	0x0038	; ????
+  2c:	35 00       	.word	0x0035	; ????
+  2e:	32 00       	.word	0x0032	; ????
+
+00000030 <port_to_mode_PGM>:
+  30:	00 00 00 00 37 00 34 00 31 00                       ....7.4.1.
+
+0000003a <digital_pin_to_port_PGM>:
+  3a:	04 04 04 04 04 04 04 04 02 02 02 02 02 02 03 03     ................
+  4a:	03 03 03 03 02 02 03                                .......
+
+00000051 <digital_pin_to_bit_mask_PGM>:
+  51:	01 02 04 08 10 20 40 80 01 02 04 08 10 20 01 02     ..... @...... ..
+  61:	04 08 10 20 40 80 40                                ... @.@
+
+00000068 <__ctors_start>:
+__ctors_start():
+  68:	6d 02       	muls	r22, r29
+
+0000006a <__ctors_end>:
+__dtors_end():
+  6a:	11 24       	eor	r1, r1
+  6c:	1f be       	out	0x3f, r1	; 63
+  6e:	cf e5       	ldi	r28, 0x5F	; 95
+  70:	d4 e0       	ldi	r29, 0x04	; 4
+  72:	de bf       	out	0x3e, r29	; 62
+  74:	cd bf       	out	0x3d, r28	; 61
+
+00000076 <__do_copy_data>:
+__do_copy_data():
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2409
+  76:	10 e0       	ldi	r17, 0x00	; 0
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2410
+  78:	a0 e6       	ldi	r26, 0x60	; 96
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2411
+  7a:	b0 e0       	ldi	r27, 0x00	; 0
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2412
+  7c:	e4 e5       	ldi	r30, 0x54	; 84
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2413
+  7e:	f7 e0       	ldi	r31, 0x07	; 7
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2414
+  80:	02 c0       	rjmp	.+4      	; 0x86 <__do_copy_data+0x10>
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2417
+  82:	05 90       	lpm	r0, Z+
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2422
+  84:	0d 92       	st	X+, r0
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2424
+  86:	a8 3a       	cpi	r26, 0xA8	; 168
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2425
+  88:	b1 07       	cpc	r27, r17
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2426
+  8a:	d9 f7       	brne	.-10     	; 0x82 <__do_copy_data+0xc>
+
+0000008c <__do_clear_bss>:
+__do_clear_bss():
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2441
+  8c:	21 e0       	ldi	r18, 0x01	; 1
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2442
+  8e:	a8 ea       	ldi	r26, 0xA8	; 168
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2443
+  90:	b0 e0       	ldi	r27, 0x00	; 0
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2444
+  92:	01 c0       	rjmp	.+2      	; 0x96 <.do_clear_bss_start>
+
+00000094 <.do_clear_bss_loop>:
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2446
+  94:	1d 92       	st	X+, r1
+
+00000096 <.do_clear_bss_start>:
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2448
+  96:	a6 35       	cpi	r26, 0x56	; 86
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2449
+  98:	b2 07       	cpc	r27, r18
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2450
+  9a:	e1 f7       	brne	.-8      	; 0x94 <.do_clear_bss_loop>
+
+0000009c <__do_global_ctors>:
+__do_global_ctors():
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2466
+  9c:	10 e0       	ldi	r17, 0x00	; 0
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2467
+  9e:	c5 e3       	ldi	r28, 0x35	; 53
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2468
+  a0:	d0 e0       	ldi	r29, 0x00	; 0
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2472
+  a2:	03 c0       	rjmp	.+6      	; 0xaa <__do_global_ctors+0xe>
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2474
+  a4:	21 97       	sbiw	r28, 0x01	; 1
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2480
+  a6:	fe 01       	movw	r30, r28
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2481
+  a8:	4d d3       	rcall	.+1690   	; 0x744 <__tablejump2__>
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2483
+  aa:	c4 33       	cpi	r28, 0x34	; 52
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2484
+  ac:	d1 07       	cpc	r29, r17
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2489
+  ae:	d1 f7       	brne	.-12     	; 0xa4 <__do_global_ctors+0x8>
+  b0:	4c d2       	rcall	.+1176   	; 0x54a <main>
+  b2:	4e c3       	rjmp	.+1692   	; 0x750 <_exit>
+
+000000b4 <__bad_interrupt>:
+__bad_interrupt():
+  b4:	a5 cf       	rjmp	.-182    	; 0x0 <__vectors>
+
+000000b6 <micros>:
+micros():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:237
+  unsigned char f; // temporary storage for millis fraction counter
+  unsigned char q = 0; // record whether an overflow is flagged
+#endif
+  // t will be the number where the timer0 counter stopped
+  uint8_t t;
+  uint8_t oldSREG = SREG;
+  b6:	3f b7       	in	r19, 0x3f	; 63
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:240
+
+  // Stop all interrupts
+  cli();
+  b8:	f8 94       	cli
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:247
+#ifdef CORRECT_EXACT_MICROS
+  // combine exact millisec and 8usec counters
+  m = timer0_millis;
+  f = timer0_fract;
+#else
+  m = timer0_overflow_count;
+  ba:	80 91 b1 00 	lds	r24, 0x00B1	; 0x8000b1 <timer0_overflow_count>
+  be:	90 91 b2 00 	lds	r25, 0x00B2	; 0x8000b2 <timer0_overflow_count+0x1>
+  c2:	a0 91 b3 00 	lds	r26, 0x00B3	; 0x8000b3 <timer0_overflow_count+0x2>
+  c6:	b0 91 b4 00 	lds	r27, 0x00B4	; 0x8000b4 <timer0_overflow_count+0x3>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:252
+#endif
+
+  // TCNT0 : The Timer Counter Register
+#if defined(TCNT0)
+  t = TCNT0;
+  ca:	22 b7       	in	r18, 0x32	; 50
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:268
+    m++;
+#else
+    q = 1;
+#endif
+#else
+  if ((TIFR & _BV(TOV0)) && (t < 255))
+  cc:	08 b6       	in	r0, 0x38	; 56
+  ce:	00 fe       	sbrs	r0, 0
+  d0:	05 c0       	rjmp	.+10     	; 0xdc <micros+0x26>
+  d2:	2f 3f       	cpi	r18, 0xFF	; 255
+  d4:	19 f0       	breq	.+6      	; 0xdc <micros+0x26>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:270
+#ifndef CORRECT_EXACT_MICROS
+    m++;
+  d6:	01 96       	adiw	r24, 0x01	; 1
+  d8:	a1 1d       	adc	r26, r1
+  da:	b1 1d       	adc	r27, r1
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:276
+#else
+    q = 1;
+#endif
+#endif
+  // Restore SREG
+  SREG = oldSREG;
+  dc:	3f bf       	out	0x3f, r19	; 63
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:292
+      ((t * MICROSECONDS_PER_TIMER0_OVERFLOW) >> 8);
+  return q ? m + MICROSECONDS_PER_TIMER0_OVERFLOW : m;
+#elif 1
+  /* All power-of-two Megahertz frequencies enter here, as well as 12.8 MHz.
+     We only end up here if right shift before multiplication is exact. */
+  return ((m << 8) + t) * (MICROSECONDS_PER_TIMER0_OVERFLOW >> 8);
+  de:	ba 2f       	mov	r27, r26
+  e0:	a9 2f       	mov	r26, r25
+  e2:	98 2f       	mov	r25, r24
+  e4:	88 27       	eor	r24, r24
+  e6:	bc 01       	movw	r22, r24
+  e8:	cd 01       	movw	r24, r26
+  ea:	62 0f       	add	r22, r18
+  ec:	71 1d       	adc	r23, r1
+  ee:	81 1d       	adc	r24, r1
+  f0:	91 1d       	adc	r25, r1
+  f2:	42 e0       	ldi	r20, 0x02	; 2
+  f4:	66 0f       	add	r22, r22
+  f6:	77 1f       	adc	r23, r23
+  f8:	88 1f       	adc	r24, r24
+  fa:	99 1f       	adc	r25, r25
+  fc:	4a 95       	dec	r20
+  fe:	d1 f7       	brne	.-12     	; 0xf4 <micros+0x3e>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:393
+  // m & t are multiplied by 4 (since it was already multiplied by 256)
+  // t is multiplied by 4
+  return ((m << 8) + t) * (64 / clockCyclesPerMicrosecond());
+#endif
+#endif // 0
+}
+ 100:	08 95       	ret
+
+00000102 <millis>:
+millis():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:218
+}
+
+unsigned long millis()
+{
+  unsigned long m;
+  uint8_t oldSREG = SREG;
+ 102:	2f b7       	in	r18, 0x3f	; 63
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:222
+
+  // disable interrupts while we read timer0_millis or we might get an
+  // inconsistent value (e.g. in the middle of a write to timer0_millis)
+  cli();
+ 104:	f8 94       	cli
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:223
+  m = timer0_millis;
+ 106:	60 91 ad 00 	lds	r22, 0x00AD	; 0x8000ad <timer0_millis>
+ 10a:	70 91 ae 00 	lds	r23, 0x00AE	; 0x8000ae <timer0_millis+0x1>
+ 10e:	80 91 af 00 	lds	r24, 0x00AF	; 0x8000af <timer0_millis+0x2>
+ 112:	90 91 b0 00 	lds	r25, 0x00B0	; 0x8000b0 <timer0_millis+0x3>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:224
+  SREG = oldSREG;
+ 116:	2f bf       	out	0x3f, r18	; 63
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:227
+
+  return m;
+}
+ 118:	08 95       	ret
+
+0000011a <Print::write(unsigned char const*, unsigned int)>:
+_ZN5Print5writeEPKhj():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/Print.cpp:35
+
+// Public Methods //////////////////////////////////////////////////////////////
+
+/* default implementation: may be overridden */
+size_t Print::write(const uint8_t *buffer, size_t size)
+{
+ 11a:	af 92       	push	r10
+ 11c:	bf 92       	push	r11
+ 11e:	cf 92       	push	r12
+ 120:	df 92       	push	r13
+ 122:	ef 92       	push	r14
+ 124:	ff 92       	push	r15
+ 126:	0f 93       	push	r16
+ 128:	1f 93       	push	r17
+ 12a:	cf 93       	push	r28
+ 12c:	df 93       	push	r29
+ 12e:	6c 01       	movw	r12, r24
+ 130:	7b 01       	movw	r14, r22
+ 132:	8b 01       	movw	r16, r22
+ 134:	04 0f       	add	r16, r20
+ 136:	15 1f       	adc	r17, r21
+ 138:	eb 01       	movw	r28, r22
+ 13a:	5e 01       	movw	r10, r28
+ 13c:	ae 18       	sub	r10, r14
+ 13e:	bf 08       	sbc	r11, r15
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/Print.cpp:37
+  size_t n = 0;
+  while (size--) {
+ 140:	c0 17       	cp	r28, r16
+ 142:	d1 07       	cpc	r29, r17
+ 144:	59 f0       	breq	.+22     	; 0x15c <Print::write(unsigned char const*, unsigned int)+0x42>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/Print.cpp:38
+    if (write(*buffer++)) n++;
+ 146:	69 91       	ld	r22, Y+
+ 148:	d6 01       	movw	r26, r12
+ 14a:	ed 91       	ld	r30, X+
+ 14c:	fc 91       	ld	r31, X
+ 14e:	01 90       	ld	r0, Z+
+ 150:	f0 81       	ld	r31, Z
+ 152:	e0 2d       	mov	r30, r0
+ 154:	c6 01       	movw	r24, r12
+ 156:	09 95       	icall
+ 158:	89 2b       	or	r24, r25
+ 15a:	79 f7       	brne	.-34     	; 0x13a <Print::write(unsigned char const*, unsigned int)+0x20>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/Print.cpp:42
+    else break;
+  }
+  return n;
+}
+ 15c:	c5 01       	movw	r24, r10
+ 15e:	df 91       	pop	r29
+ 160:	cf 91       	pop	r28
+ 162:	1f 91       	pop	r17
+ 164:	0f 91       	pop	r16
+ 166:	ff 90       	pop	r15
+ 168:	ef 90       	pop	r14
+ 16a:	df 90       	pop	r13
+ 16c:	cf 90       	pop	r12
+ 16e:	bf 90       	pop	r11
+ 170:	af 90       	pop	r10
+ 172:	08 95       	ret
+
+00000174 <HardwareSerial::availableForWrite()>:
+_ZN14HardwareSerial17availableForWriteEv():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:195
+{
+  tx_buffer_index_t head;
+  tx_buffer_index_t tail;
+
+  TX_BUFFER_ATOMIC {
+    head = _tx_buffer_head;
+ 174:	fc 01       	movw	r30, r24
+ 176:	53 8d       	ldd	r21, Z+27	; 0x1b
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:196
+    tail = _tx_buffer_tail;
+ 178:	44 8d       	ldd	r20, Z+28	; 0x1c
+ 17a:	25 2f       	mov	r18, r21
+ 17c:	30 e0       	ldi	r19, 0x00	; 0
+ 17e:	84 2f       	mov	r24, r20
+ 180:	90 e0       	ldi	r25, 0x00	; 0
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:198
+  }
+  if (head >= tail) return SERIAL_TX_BUFFER_SIZE - 1 - head + tail;
+ 182:	82 1b       	sub	r24, r18
+ 184:	93 0b       	sbc	r25, r19
+ 186:	54 17       	cp	r21, r20
+ 188:	10 f0       	brcs	.+4      	; 0x18e <HardwareSerial::availableForWrite()+0x1a>
+ 18a:	cf 96       	adiw	r24, 0x3f	; 63
+ 18c:	08 95       	ret
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:199
+  return tail - head - 1;
+ 18e:	01 97       	sbiw	r24, 0x01	; 1
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:200
+}
+ 190:	08 95       	ret
+
+00000192 <HardwareSerial::read()>:
+_ZN14HardwareSerial4readEv():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:178
+    return _rx_buffer[_rx_buffer_tail];
+  }
+}
+
+int HardwareSerial::read(void)
+{
+ 192:	fc 01       	movw	r30, r24
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:180
+  // if the head isn't ahead of the tail, we don't have any characters
+  if (_rx_buffer_head == _rx_buffer_tail) {
+ 194:	91 8d       	ldd	r25, Z+25	; 0x19
+ 196:	82 8d       	ldd	r24, Z+26	; 0x1a
+ 198:	98 17       	cp	r25, r24
+ 19a:	61 f0       	breq	.+24     	; 0x1b4 <HardwareSerial::read()+0x22>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:183
+    return -1;
+  } else {
+    unsigned char c = _rx_buffer[_rx_buffer_tail];
+ 19c:	a2 8d       	ldd	r26, Z+26	; 0x1a
+ 19e:	ae 0f       	add	r26, r30
+ 1a0:	bf 2f       	mov	r27, r31
+ 1a2:	b1 1d       	adc	r27, r1
+ 1a4:	5d 96       	adiw	r26, 0x1d	; 29
+ 1a6:	8c 91       	ld	r24, X
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:184
+    _rx_buffer_tail = (rx_buffer_index_t)(_rx_buffer_tail + 1) % SERIAL_RX_BUFFER_SIZE;
+ 1a8:	92 8d       	ldd	r25, Z+26	; 0x1a
+ 1aa:	9f 5f       	subi	r25, 0xFF	; 255
+ 1ac:	9f 73       	andi	r25, 0x3F	; 63
+ 1ae:	92 8f       	std	Z+26, r25	; 0x1a
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:185
+    return c;
+ 1b0:	90 e0       	ldi	r25, 0x00	; 0
+ 1b2:	08 95       	ret
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:181
+
+int HardwareSerial::read(void)
+{
+  // if the head isn't ahead of the tail, we don't have any characters
+  if (_rx_buffer_head == _rx_buffer_tail) {
+    return -1;
+ 1b4:	8f ef       	ldi	r24, 0xFF	; 255
+ 1b6:	9f ef       	ldi	r25, 0xFF	; 255
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:187
+  } else {
+    unsigned char c = _rx_buffer[_rx_buffer_tail];
+    _rx_buffer_tail = (rx_buffer_index_t)(_rx_buffer_tail + 1) % SERIAL_RX_BUFFER_SIZE;
+    return c;
+  }
+}
+ 1b8:	08 95       	ret
+
+000001ba <HardwareSerial::peek()>:
+_ZN14HardwareSerial4peekEv():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:169
+{
+  return ((unsigned int)(SERIAL_RX_BUFFER_SIZE + _rx_buffer_head - _rx_buffer_tail)) % SERIAL_RX_BUFFER_SIZE;
+}
+
+int HardwareSerial::peek(void)
+{
+ 1ba:	fc 01       	movw	r30, r24
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:170
+  if (_rx_buffer_head == _rx_buffer_tail) {
+ 1bc:	91 8d       	ldd	r25, Z+25	; 0x19
+ 1be:	82 8d       	ldd	r24, Z+26	; 0x1a
+ 1c0:	98 17       	cp	r25, r24
+ 1c2:	31 f0       	breq	.+12     	; 0x1d0 <HardwareSerial::peek()+0x16>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:173
+    return -1;
+  } else {
+    return _rx_buffer[_rx_buffer_tail];
+ 1c4:	82 8d       	ldd	r24, Z+26	; 0x1a
+ 1c6:	e8 0f       	add	r30, r24
+ 1c8:	f1 1d       	adc	r31, r1
+ 1ca:	85 8d       	ldd	r24, Z+29	; 0x1d
+ 1cc:	90 e0       	ldi	r25, 0x00	; 0
+ 1ce:	08 95       	ret
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:171
+}
+
+int HardwareSerial::peek(void)
+{
+  if (_rx_buffer_head == _rx_buffer_tail) {
+    return -1;
+ 1d0:	8f ef       	ldi	r24, 0xFF	; 255
+ 1d2:	9f ef       	ldi	r25, 0xFF	; 255
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:175
+  } else {
+    return _rx_buffer[_rx_buffer_tail];
+  }
+}
+ 1d4:	08 95       	ret
+
+000001d6 <HardwareSerial::available()>:
+_ZN14HardwareSerial9availableEv():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:164
+  // clear any received data
+  _rx_buffer_head = _rx_buffer_tail;
+}
+
+int HardwareSerial::available(void)
+{
+ 1d6:	fc 01       	movw	r30, r24
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:165
+  return ((unsigned int)(SERIAL_RX_BUFFER_SIZE + _rx_buffer_head - _rx_buffer_tail)) % SERIAL_RX_BUFFER_SIZE;
+ 1d8:	91 8d       	ldd	r25, Z+25	; 0x19
+ 1da:	22 8d       	ldd	r18, Z+26	; 0x1a
+ 1dc:	89 2f       	mov	r24, r25
+ 1de:	90 e0       	ldi	r25, 0x00	; 0
+ 1e0:	80 5c       	subi	r24, 0xC0	; 192
+ 1e2:	9f 4f       	sbci	r25, 0xFF	; 255
+ 1e4:	82 1b       	sub	r24, r18
+ 1e6:	91 09       	sbc	r25, r1
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:166
+}
+ 1e8:	8f 73       	andi	r24, 0x3F	; 63
+ 1ea:	99 27       	eor	r25, r25
+ 1ec:	08 95       	ret
+
+000001ee <Serial0_available()>:
+_Z17Serial0_availablev():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial0.cpp:76
+#endif
+
+// Function that can be weakly referenced by serialEventRun to prevent
+// pulling in this file if it's not otherwise used.
+bool Serial0_available() {
+  return Serial.available();
+ 1ee:	85 eb       	ldi	r24, 0xB5	; 181
+ 1f0:	90 e0       	ldi	r25, 0x00	; 0
+ 1f2:	f1 df       	rcall	.-30     	; 0x1d6 <HardwareSerial::available()>
+ 1f4:	21 e0       	ldi	r18, 0x01	; 1
+ 1f6:	89 2b       	or	r24, r25
+ 1f8:	09 f4       	brne	.+2      	; 0x1fc <Serial0_available()+0xe>
+ 1fa:	20 e0       	ldi	r18, 0x00	; 0
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial0.cpp:77
+}
+ 1fc:	82 2f       	mov	r24, r18
+ 1fe:	08 95       	ret
+
+00000200 <serialEventRun()>:
+_Z14serialEventRunv():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:67
+#endif
+
+void serialEventRun(void)
+{
+#if defined(HAVE_HWSERIAL0)
+  if (Serial0_available && serialEvent && Serial0_available()) serialEvent();
+ 200:	80 e0       	ldi	r24, 0x00	; 0
+ 202:	90 e0       	ldi	r25, 0x00	; 0
+ 204:	89 2b       	or	r24, r25
+ 206:	19 f0       	breq	.+6      	; 0x20e <serialEventRun()+0xe>
+ 208:	f2 df       	rcall	.-28     	; 0x1ee <Serial0_available()>
+ 20a:	81 11       	cpse	r24, r1
+ 20c:	f9 ce       	rjmp	.-526    	; 0x0 <__vectors>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:78
+  if (Serial2_available && serialEvent2 && Serial2_available()) serialEvent2();
+#endif
+#if defined(HAVE_HWSERIAL3)
+  if (Serial3_available && serialEvent3 && Serial3_available()) serialEvent3();
+#endif
+}
+ 20e:	08 95       	ret
+
+00000210 <HardwareSerial::_tx_udr_empty_irq()>:
+_ZN14HardwareSerial17_tx_udr_empty_irqEv():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:90
+#endif
+
+// Actual interrupt handlers //////////////////////////////////////////////////////////////
+
+void HardwareSerial::_tx_udr_empty_irq(void)
+{
+ 210:	fc 01       	movw	r30, r24
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:93
+  // If interrupts are enabled, there must be more data in the output
+  // buffer. Send the next byte
+  unsigned char c = _tx_buffer[_tx_buffer_tail];
+ 212:	a4 8d       	ldd	r26, Z+28	; 0x1c
+ 214:	a8 0f       	add	r26, r24
+ 216:	b9 2f       	mov	r27, r25
+ 218:	b1 1d       	adc	r27, r1
+ 21a:	a3 5a       	subi	r26, 0xA3	; 163
+ 21c:	bf 4f       	sbci	r27, 0xFF	; 255
+ 21e:	2c 91       	ld	r18, X
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:94
+  _tx_buffer_tail = (_tx_buffer_tail + 1) % SERIAL_TX_BUFFER_SIZE;
+ 220:	84 8d       	ldd	r24, Z+28	; 0x1c
+ 222:	90 e0       	ldi	r25, 0x00	; 0
+ 224:	01 96       	adiw	r24, 0x01	; 1
+ 226:	8f 73       	andi	r24, 0x3F	; 63
+ 228:	99 27       	eor	r25, r25
+ 22a:	84 8f       	std	Z+28, r24	; 0x1c
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:96
+
+  *_udr = c;
+ 22c:	a6 89       	ldd	r26, Z+22	; 0x16
+ 22e:	b7 89       	ldd	r27, Z+23	; 0x17
+ 230:	2c 93       	st	X, r18
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:106
+  // written to the rest.
+
+  #ifdef MPCM0
+    *_ucsra = ((*_ucsra) & ((1 << U2X0) | (1 << MPCM0))) | (1 << TXC0);
+  #else
+    *_ucsra = ((*_ucsra) & ((1 << U2X0) | (1 << TXC0)));
+ 232:	a0 89       	ldd	r26, Z+16	; 0x10
+ 234:	b1 89       	ldd	r27, Z+17	; 0x11
+ 236:	8c 91       	ld	r24, X
+ 238:	82 74       	andi	r24, 0x42	; 66
+ 23a:	8c 93       	st	X, r24
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:109
+  #endif
+
+  if (_tx_buffer_head == _tx_buffer_tail) {
+ 23c:	93 8d       	ldd	r25, Z+27	; 0x1b
+ 23e:	84 8d       	ldd	r24, Z+28	; 0x1c
+ 240:	98 13       	cpse	r25, r24
+ 242:	06 c0       	rjmp	.+12     	; 0x250 <HardwareSerial::_tx_udr_empty_irq()+0x40>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:111
+    // Buffer empty, so disable interrupts
+    *_ucsrb &= ~_BV(UDRIE0);
+ 244:	02 88       	ldd	r0, Z+18	; 0x12
+ 246:	f3 89       	ldd	r31, Z+19	; 0x13
+ 248:	e0 2d       	mov	r30, r0
+ 24a:	80 81       	ld	r24, Z
+ 24c:	8f 7d       	andi	r24, 0xDF	; 223
+ 24e:	80 83       	st	Z, r24
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:113
+  }
+}
+ 250:	08 95       	ret
+
+00000252 <HardwareSerial::write(unsigned char)>:
+_ZN14HardwareSerial5writeEh():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:223
+  // If we get here, nothing is queued anymore (DRIE is disabled) and
+  // the hardware finished tranmission (TXC is set).
+}
+
+size_t HardwareSerial::write(uint8_t c)
+{
+ 252:	ef 92       	push	r14
+ 254:	ff 92       	push	r15
+ 256:	0f 93       	push	r16
+ 258:	1f 93       	push	r17
+ 25a:	cf 93       	push	r28
+ 25c:	df 93       	push	r29
+ 25e:	ec 01       	movw	r28, r24
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:224
+  _written = true;
+ 260:	81 e0       	ldi	r24, 0x01	; 1
+ 262:	88 8f       	std	Y+24, r24	; 0x18
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:229
+  // If the buffer and the data register is empty, just write the byte
+  // to the data register and be done. This shortcut helps
+  // significantly improve the effective datarate at high (>
+  // 500kbit/s) bitrates, where interrupt overhead becomes a slowdown.
+  if (_tx_buffer_head == _tx_buffer_tail && bit_is_set(*_ucsra, UDRE0)) {
+ 264:	9b 8d       	ldd	r25, Y+27	; 0x1b
+ 266:	8c 8d       	ldd	r24, Y+28	; 0x1c
+ 268:	98 13       	cpse	r25, r24
+ 26a:	19 c0       	rjmp	.+50     	; 0x29e <HardwareSerial::write(unsigned char)+0x4c>
+ 26c:	e8 89       	ldd	r30, Y+16	; 0x10
+ 26e:	f9 89       	ldd	r31, Y+17	; 0x11
+ 270:	80 81       	ld	r24, Z
+ 272:	85 ff       	sbrs	r24, 5
+ 274:	14 c0       	rjmp	.+40     	; 0x29e <HardwareSerial::write(unsigned char)+0x4c>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:238
+    // So writing UDR must happen first.
+    // Writing UDR and clearing TC must be done atomically, otherwise
+    // interrupts might delay the TXC clear so the byte written to UDR
+    // is transmitted (setting TXC) before clearing TXC. Then TXC will
+    // be cleared when no bytes are left, causing flush() to hang
+    ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+ 276:	9f b7       	in	r25, 0x3f	; 63
+__iCliRetVal():
+/home/pdsilva/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/avr/include/util/atomic.h:50
+    return 1;
+}
+
+static __inline__ uint8_t __iCliRetVal(void)
+{
+    cli();
+ 278:	f8 94       	cli
+_ZN14HardwareSerial5writeEh():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:239
+      *_udr = c;
+ 27a:	ee 89       	ldd	r30, Y+22	; 0x16
+ 27c:	ff 89       	ldd	r31, Y+23	; 0x17
+ 27e:	60 83       	st	Z, r22
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:243
+      #ifdef MPCM0
+        *_ucsra = ((*_ucsra) & ((1 << U2X0) | (1 << MPCM0))) | (1 << TXC0);
+      #else
+        *_ucsra = ((*_ucsra) & ((1 << U2X0) | (1 << TXC0)));
+ 280:	e8 89       	ldd	r30, Y+16	; 0x10
+ 282:	f9 89       	ldd	r31, Y+17	; 0x11
+ 284:	80 81       	ld	r24, Z
+ 286:	82 74       	andi	r24, 0x42	; 66
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:271
+  // make atomic to prevent execution of ISR between setting the
+  // head pointer and setting the interrupt flag resulting in buffer
+  // retransmission
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+    _tx_buffer_head = i;
+    *_ucsrb |= _BV(UDRIE0);
+ 288:	80 83       	st	Z, r24
+__iRestore():
+/home/pdsilva/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/avr/include/util/atomic.h:70
+    (void)__s;
+}
+
+static __inline__ void __iRestore(const  uint8_t *__s)
+{
+    SREG = *__s;
+ 28a:	9f bf       	out	0x3f, r25	; 63
+_ZN14HardwareSerial5writeEh():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:275
+  }
+  
+  return 1;
+}
+ 28c:	81 e0       	ldi	r24, 0x01	; 1
+ 28e:	90 e0       	ldi	r25, 0x00	; 0
+ 290:	df 91       	pop	r29
+ 292:	cf 91       	pop	r28
+ 294:	1f 91       	pop	r17
+ 296:	0f 91       	pop	r16
+ 298:	ff 90       	pop	r15
+ 29a:	ef 90       	pop	r14
+ 29c:	08 95       	ret
+ 29e:	f6 2e       	mov	r15, r22
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:248
+        *_ucsra = ((*_ucsra) & ((1 << U2X0) | (1 << TXC0)));
+      #endif
+    }
+    return 1;
+  }
+  tx_buffer_index_t i = (_tx_buffer_head + 1) % SERIAL_TX_BUFFER_SIZE;
+ 2a0:	0b 8d       	ldd	r16, Y+27	; 0x1b
+ 2a2:	10 e0       	ldi	r17, 0x00	; 0
+ 2a4:	0f 5f       	subi	r16, 0xFF	; 255
+ 2a6:	1f 4f       	sbci	r17, 0xFF	; 255
+ 2a8:	0f 73       	andi	r16, 0x3F	; 63
+ 2aa:	11 27       	eor	r17, r17
+ 2ac:	e0 2e       	mov	r14, r16
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:252
+
+  // If the output buffer is full, there's nothing for it other than to 
+  // wait for the interrupt handler to empty it a bit
+  while (i == _tx_buffer_tail) {
+ 2ae:	8c 8d       	ldd	r24, Y+28	; 0x1c
+ 2b0:	8e 11       	cpse	r24, r14
+ 2b2:	0b c0       	rjmp	.+22     	; 0x2ca <HardwareSerial::write(unsigned char)+0x78>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:253
+    if (bit_is_clear(SREG, SREG_I)) {
+ 2b4:	0f b6       	in	r0, 0x3f	; 63
+ 2b6:	07 fc       	sbrc	r0, 7
+ 2b8:	fa cf       	rjmp	.-12     	; 0x2ae <HardwareSerial::write(unsigned char)+0x5c>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:258
+      // Interrupts are disabled, so we'll have to poll the data
+      // register empty flag ourselves. If it is set, pretend an
+      // interrupt has happened and call the handler to free up
+      // space for us.
+      if(bit_is_set(*_ucsra, UDRE0))
+ 2ba:	e8 89       	ldd	r30, Y+16	; 0x10
+ 2bc:	f9 89       	ldd	r31, Y+17	; 0x11
+ 2be:	80 81       	ld	r24, Z
+ 2c0:	85 ff       	sbrs	r24, 5
+ 2c2:	f5 cf       	rjmp	.-22     	; 0x2ae <HardwareSerial::write(unsigned char)+0x5c>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:259
+        _tx_udr_empty_irq();
+ 2c4:	ce 01       	movw	r24, r28
+ 2c6:	a4 df       	rcall	.-184    	; 0x210 <HardwareSerial::_tx_udr_empty_irq()>
+ 2c8:	f2 cf       	rjmp	.-28     	; 0x2ae <HardwareSerial::write(unsigned char)+0x5c>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:265
+    } else {
+      // nop, the interrupt handler will free up space for us
+    }
+  }
+
+  _tx_buffer[_tx_buffer_head] = c;
+ 2ca:	eb 8d       	ldd	r30, Y+27	; 0x1b
+ 2cc:	ec 0f       	add	r30, r28
+ 2ce:	fd 2f       	mov	r31, r29
+ 2d0:	f1 1d       	adc	r31, r1
+ 2d2:	e3 5a       	subi	r30, 0xA3	; 163
+ 2d4:	ff 4f       	sbci	r31, 0xFF	; 255
+ 2d6:	f0 82       	st	Z, r15
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:269
+  // make atomic to prevent execution of ISR between setting the
+  // head pointer and setting the interrupt flag resulting in buffer
+  // retransmission
+  ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+ 2d8:	9f b7       	in	r25, 0x3f	; 63
+__iCliRetVal():
+/home/pdsilva/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/avr/include/util/atomic.h:50
+    return 1;
+}
+
+static __inline__ uint8_t __iCliRetVal(void)
+{
+    cli();
+ 2da:	f8 94       	cli
+_ZN14HardwareSerial5writeEh():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:270
+    _tx_buffer_head = i;
+ 2dc:	0b 8f       	std	Y+27, r16	; 0x1b
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:271
+    *_ucsrb |= _BV(UDRIE0);
+ 2de:	ea 89       	ldd	r30, Y+18	; 0x12
+ 2e0:	fb 89       	ldd	r31, Y+19	; 0x13
+ 2e2:	80 81       	ld	r24, Z
+ 2e4:	80 62       	ori	r24, 0x20	; 32
+ 2e6:	d0 cf       	rjmp	.-96     	; 0x288 <HardwareSerial::write(unsigned char)+0x36>
+
+000002e8 <HardwareSerial::flush()>:
+_ZN14HardwareSerial5flushEv():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:203
+  if (head >= tail) return SERIAL_TX_BUFFER_SIZE - 1 - head + tail;
+  return tail - head - 1;
+}
+
+void HardwareSerial::flush()
+{
+ 2e8:	cf 93       	push	r28
+ 2ea:	df 93       	push	r29
+ 2ec:	ec 01       	movw	r28, r24
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:207
+  // If we have never written a byte, no need to flush. This special
+  // case is needed since there is no way to force the TXC (transmit
+  // complete) bit to 1 during initialization
+  if (!_written)
+ 2ee:	88 8d       	ldd	r24, Y+24	; 0x18
+ 2f0:	88 23       	and	r24, r24
+ 2f2:	b1 f0       	breq	.+44     	; 0x320 <HardwareSerial::flush()+0x38>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:210
+    return;
+
+  while (bit_is_set(*_ucsrb, UDRIE0) || bit_is_clear(*_ucsra, TXC0)) {
+ 2f4:	aa 89       	ldd	r26, Y+18	; 0x12
+ 2f6:	bb 89       	ldd	r27, Y+19	; 0x13
+ 2f8:	e8 89       	ldd	r30, Y+16	; 0x10
+ 2fa:	f9 89       	ldd	r31, Y+17	; 0x11
+ 2fc:	8c 91       	ld	r24, X
+ 2fe:	85 fd       	sbrc	r24, 5
+ 300:	03 c0       	rjmp	.+6      	; 0x308 <HardwareSerial::flush()+0x20>
+ 302:	80 81       	ld	r24, Z
+ 304:	86 fd       	sbrc	r24, 6
+ 306:	0c c0       	rjmp	.+24     	; 0x320 <HardwareSerial::flush()+0x38>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:211
+    if (bit_is_clear(SREG, SREG_I) && bit_is_set(*_ucsrb, UDRIE0))
+ 308:	0f b6       	in	r0, 0x3f	; 63
+ 30a:	07 fc       	sbrc	r0, 7
+ 30c:	f7 cf       	rjmp	.-18     	; 0x2fc <HardwareSerial::flush()+0x14>
+ 30e:	8c 91       	ld	r24, X
+ 310:	85 ff       	sbrs	r24, 5
+ 312:	f2 cf       	rjmp	.-28     	; 0x2f8 <HardwareSerial::flush()+0x10>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:215
+      // Interrupts are globally disabled, but the DR empty
+      // interrupt should be enabled, so poll the DR empty flag to
+      // prevent deadlock
+      if (bit_is_set(*_ucsra, UDRE0))
+ 314:	80 81       	ld	r24, Z
+ 316:	85 ff       	sbrs	r24, 5
+ 318:	ed cf       	rjmp	.-38     	; 0x2f4 <HardwareSerial::flush()+0xc>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:216
+        _tx_udr_empty_irq();
+ 31a:	ce 01       	movw	r24, r28
+ 31c:	79 df       	rcall	.-270    	; 0x210 <HardwareSerial::_tx_udr_empty_irq()>
+ 31e:	ea cf       	rjmp	.-44     	; 0x2f4 <HardwareSerial::flush()+0xc>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:220
+  }
+  // If we get here, nothing is queued anymore (DRIE is disabled) and
+  // the hardware finished tranmission (TXC is set).
+}
+ 320:	df 91       	pop	r29
+ 322:	cf 91       	pop	r28
+ 324:	08 95       	ret
+
+00000326 <__vector_9>:
+__vector_9():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:159
+#if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
+ISR(TIM0_OVF_vect)
+#else
+ISR(TIMER0_OVF_vect)
+#endif
+{
+ 326:	1f 92       	push	r1
+ 328:	0f 92       	push	r0
+ 32a:	0f b6       	in	r0, 0x3f	; 63
+ 32c:	0f 92       	push	r0
+ 32e:	11 24       	eor	r1, r1
+ 330:	2f 93       	push	r18
+ 332:	3f 93       	push	r19
+ 334:	8f 93       	push	r24
+ 336:	9f 93       	push	r25
+ 338:	af 93       	push	r26
+ 33a:	bf 93       	push	r27
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:167
+  static unsigned char timer0_exact = 0;
+#endif
+
+  // copy these to local variables so they can be stored in registers
+  // (volatile variables must be read from memory on every access, so this saves time)
+  unsigned long m = timer0_millis;
+ 33c:	80 91 ad 00 	lds	r24, 0x00AD	; 0x8000ad <timer0_millis>
+ 340:	90 91 ae 00 	lds	r25, 0x00AE	; 0x8000ae <timer0_millis+0x1>
+ 344:	a0 91 af 00 	lds	r26, 0x00AF	; 0x8000af <timer0_millis+0x2>
+ 348:	b0 91 b0 00 	lds	r27, 0x00B0	; 0x8000b0 <timer0_millis+0x3>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:168
+  unsigned char f = timer0_fract;
+ 34c:	30 91 ac 00 	lds	r19, 0x00AC	; 0x8000ac <timer0_fract>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:170
+
+  f += FRACT_INC FRACT_INC_PLUS;
+ 350:	23 e0       	ldi	r18, 0x03	; 3
+ 352:	23 0f       	add	r18, r19
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:200
+    ++f;
+  }
+#endif
+#endif // CORRECT_EXACT_MILLIS
+
+  if (f >= FRACT_MAX) {
+ 354:	2d 37       	cpi	r18, 0x7D	; 125
+ 356:	68 f1       	brcs	.+90     	; 0x3b2 <__vector_9+0x8c>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:201
+    f -= FRACT_MAX;
+ 358:	26 e8       	ldi	r18, 0x86	; 134
+ 35a:	23 0f       	add	r18, r19
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:202
+    m += MILLIS_INC + 1;
+ 35c:	02 96       	adiw	r24, 0x02	; 2
+ 35e:	a1 1d       	adc	r26, r1
+ 360:	b1 1d       	adc	r27, r1
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:208
+  }
+  else {
+    m += MILLIS_INC;
+  }
+
+  timer0_fract = f;
+ 362:	20 93 ac 00 	sts	0x00AC, r18	; 0x8000ac <timer0_fract>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:209
+  timer0_millis = m;
+ 366:	80 93 ad 00 	sts	0x00AD, r24	; 0x8000ad <timer0_millis>
+ 36a:	90 93 ae 00 	sts	0x00AE, r25	; 0x8000ae <timer0_millis+0x1>
+ 36e:	a0 93 af 00 	sts	0x00AF, r26	; 0x8000af <timer0_millis+0x2>
+ 372:	b0 93 b0 00 	sts	0x00B0, r27	; 0x8000b0 <timer0_millis+0x3>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:211
+#ifndef CORRECT_EXACT_MICROS
+  timer0_overflow_count++;
+ 376:	80 91 b1 00 	lds	r24, 0x00B1	; 0x8000b1 <timer0_overflow_count>
+ 37a:	90 91 b2 00 	lds	r25, 0x00B2	; 0x8000b2 <timer0_overflow_count+0x1>
+ 37e:	a0 91 b3 00 	lds	r26, 0x00B3	; 0x8000b3 <timer0_overflow_count+0x2>
+ 382:	b0 91 b4 00 	lds	r27, 0x00B4	; 0x8000b4 <timer0_overflow_count+0x3>
+ 386:	01 96       	adiw	r24, 0x01	; 1
+ 388:	a1 1d       	adc	r26, r1
+ 38a:	b1 1d       	adc	r27, r1
+ 38c:	80 93 b1 00 	sts	0x00B1, r24	; 0x8000b1 <timer0_overflow_count>
+ 390:	90 93 b2 00 	sts	0x00B2, r25	; 0x8000b2 <timer0_overflow_count+0x1>
+ 394:	a0 93 b3 00 	sts	0x00B3, r26	; 0x8000b3 <timer0_overflow_count+0x2>
+ 398:	b0 93 b4 00 	sts	0x00B4, r27	; 0x8000b4 <timer0_overflow_count+0x3>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:213
+#endif
+}
+ 39c:	bf 91       	pop	r27
+ 39e:	af 91       	pop	r26
+ 3a0:	9f 91       	pop	r25
+ 3a2:	8f 91       	pop	r24
+ 3a4:	3f 91       	pop	r19
+ 3a6:	2f 91       	pop	r18
+ 3a8:	0f 90       	pop	r0
+ 3aa:	0f be       	out	0x3f, r0	; 63
+ 3ac:	0f 90       	pop	r0
+ 3ae:	1f 90       	pop	r1
+ 3b0:	18 95       	reti
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:205
+  if (f >= FRACT_MAX) {
+    f -= FRACT_MAX;
+    m += MILLIS_INC + 1;
+  }
+  else {
+    m += MILLIS_INC;
+ 3b2:	01 96       	adiw	r24, 0x01	; 1
+ 3b4:	a1 1d       	adc	r26, r1
+ 3b6:	b1 1d       	adc	r27, r1
+ 3b8:	d4 cf       	rjmp	.-88     	; 0x362 <__vector_9+0x3c>
+
+000003ba <__vector_12>:
+__vector_12():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial0.cpp:63
+#elif defined(USART0_UDRE_vect)
+ISR(USART0_UDRE_vect)
+#else
+  #error "Don't know what the Data Register Empty vector is called for Serial"
+#endif
+{
+ 3ba:	1f 92       	push	r1
+ 3bc:	0f 92       	push	r0
+ 3be:	0f b6       	in	r0, 0x3f	; 63
+ 3c0:	0f 92       	push	r0
+ 3c2:	11 24       	eor	r1, r1
+ 3c4:	2f 93       	push	r18
+ 3c6:	3f 93       	push	r19
+ 3c8:	4f 93       	push	r20
+ 3ca:	5f 93       	push	r21
+ 3cc:	6f 93       	push	r22
+ 3ce:	7f 93       	push	r23
+ 3d0:	8f 93       	push	r24
+ 3d2:	9f 93       	push	r25
+ 3d4:	af 93       	push	r26
+ 3d6:	bf 93       	push	r27
+ 3d8:	ef 93       	push	r30
+ 3da:	ff 93       	push	r31
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial0.cpp:64
+  Serial._tx_udr_empty_irq();
+ 3dc:	85 eb       	ldi	r24, 0xB5	; 181
+ 3de:	90 e0       	ldi	r25, 0x00	; 0
+ 3e0:	17 df       	rcall	.-466    	; 0x210 <HardwareSerial::_tx_udr_empty_irq()>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial0.cpp:65
+}
+ 3e2:	ff 91       	pop	r31
+ 3e4:	ef 91       	pop	r30
+ 3e6:	bf 91       	pop	r27
+ 3e8:	af 91       	pop	r26
+ 3ea:	9f 91       	pop	r25
+ 3ec:	8f 91       	pop	r24
+ 3ee:	7f 91       	pop	r23
+ 3f0:	6f 91       	pop	r22
+ 3f2:	5f 91       	pop	r21
+ 3f4:	4f 91       	pop	r20
+ 3f6:	3f 91       	pop	r19
+ 3f8:	2f 91       	pop	r18
+ 3fa:	0f 90       	pop	r0
+ 3fc:	0f be       	out	0x3f, r0	; 63
+ 3fe:	0f 90       	pop	r0
+ 400:	1f 90       	pop	r1
+ 402:	18 95       	reti
+
+00000404 <__vector_11>:
+__vector_11():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial0.cpp:50
+#elif defined(USART_RX_vect)
+  ISR(USART_RX_vect)
+#else
+  #error "Don't know what the Data Received vector is called for Serial"
+#endif
+  {
+ 404:	1f 92       	push	r1
+ 406:	0f 92       	push	r0
+ 408:	0f b6       	in	r0, 0x3f	; 63
+ 40a:	0f 92       	push	r0
+ 40c:	11 24       	eor	r1, r1
+ 40e:	2f 93       	push	r18
+ 410:	8f 93       	push	r24
+ 412:	9f 93       	push	r25
+ 414:	ef 93       	push	r30
+ 416:	ff 93       	push	r31
+_rx_complete_irq():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial_private.h:100
+
+// Actual interrupt handlers //////////////////////////////////////////////////////////////
+
+void HardwareSerial::_rx_complete_irq(void)
+{
+  if (bit_is_clear(*_ucsra, UPE0)) {
+ 418:	e0 91 c5 00 	lds	r30, 0x00C5	; 0x8000c5 <Serial+0x10>
+ 41c:	f0 91 c6 00 	lds	r31, 0x00C6	; 0x8000c6 <Serial+0x11>
+ 420:	80 81       	ld	r24, Z
+ 422:	e0 91 cb 00 	lds	r30, 0x00CB	; 0x8000cb <Serial+0x16>
+ 426:	f0 91 cc 00 	lds	r31, 0x00CC	; 0x8000cc <Serial+0x17>
+ 42a:	82 fd       	sbrc	r24, 2
+ 42c:	1b c0       	rjmp	.+54     	; 0x464 <__stack+0x5>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial_private.h:103
+    // No Parity error, read byte and store it in the buffer if there is
+    // room
+    unsigned char c = *_udr;
+ 42e:	90 81       	ld	r25, Z
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial_private.h:104
+    rx_buffer_index_t i = (unsigned int)(_rx_buffer_head + 1) % SERIAL_RX_BUFFER_SIZE;
+ 430:	80 91 ce 00 	lds	r24, 0x00CE	; 0x8000ce <Serial+0x19>
+ 434:	8f 5f       	subi	r24, 0xFF	; 255
+ 436:	8f 73       	andi	r24, 0x3F	; 63
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial_private.h:110
+
+    // if we should be storing the received character into the location
+    // just before the tail (meaning that the head would advance to the
+    // current location of the tail), we're about to overflow the buffer
+    // and so we don't write the character or advance the head.
+    if (i != _rx_buffer_tail) {
+ 438:	20 91 cf 00 	lds	r18, 0x00CF	; 0x8000cf <Serial+0x1a>
+ 43c:	82 17       	cp	r24, r18
+ 43e:	41 f0       	breq	.+16     	; 0x450 <__vector_11+0x4c>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial_private.h:111
+      _rx_buffer[_rx_buffer_head] = c;
+ 440:	e0 91 ce 00 	lds	r30, 0x00CE	; 0x8000ce <Serial+0x19>
+ 444:	f0 e0       	ldi	r31, 0x00	; 0
+ 446:	eb 54       	subi	r30, 0x4B	; 75
+ 448:	ff 4f       	sbci	r31, 0xFF	; 255
+ 44a:	95 8f       	std	Z+29, r25	; 0x1d
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial_private.h:112
+      _rx_buffer_head = i;
+ 44c:	80 93 ce 00 	sts	0x00CE, r24	; 0x8000ce <Serial+0x19>
+__vector_11():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial0.cpp:52
+    Serial._rx_complete_irq();
+  }
+ 450:	ff 91       	pop	r31
+ 452:	ef 91       	pop	r30
+ 454:	9f 91       	pop	r25
+ 456:	8f 91       	pop	r24
+ 458:	2f 91       	pop	r18
+ 45a:	0f 90       	pop	r0
+ 45c:	0f be       	out	0x3f, r0	; 63
+ 45e:	0f 90       	pop	r0
+ 460:	1f 90       	pop	r1
+ 462:	18 95       	reti
+_rx_complete_irq():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial_private.h:116
+    }
+  } else {
+    // Parity error, read byte but discard it
+    *_udr;
+ 464:	80 81       	ld	r24, Z
+ 466:	f4 cf       	rjmp	.-24     	; 0x450 <__vector_11+0x4c>
+
+00000468 <__vector_3>:
+__vector_3():
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:86
+    TCCR2 = (1 << WGM21);              // CTC mode
+    OCR2 = 78;                         // 50us @ 16MHz/8
+    TCCR2 |= (1 << CS21);              // Prescaler 8
+    TIMSK |= (1 << OCIE2);             // Enable interrupt
+}
+ISR(TIMER2_COMP_vect) {
+ 468:	1f 92       	push	r1
+ 46a:	0f 92       	push	r0
+ 46c:	0f b6       	in	r0, 0x3f	; 63
+ 46e:	0f 92       	push	r0
+ 470:	11 24       	eor	r1, r1
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:88
+
+}
+ 472:	0f 90       	pop	r0
+ 474:	0f be       	out	0x3f, r0	; 63
+ 476:	0f 90       	pop	r0
+ 478:	1f 90       	pop	r1
+ 47a:	18 95       	reti
+
+0000047c <__vector_1>:
+__vector_1():
+ 47c:	1f 92       	push	r1
+ 47e:	0f 92       	push	r0
+ 480:	0f b6       	in	r0, 0x3f	; 63
+ 482:	0f 92       	push	r0
+ 484:	11 24       	eor	r1, r1
+ 486:	0f 90       	pop	r0
+ 488:	0f be       	out	0x3f, r0	; 63
+ 48a:	0f 90       	pop	r0
+ 48c:	1f 90       	pop	r1
+ 48e:	18 95       	reti
+
+00000490 <__vector_6>:
+__vector_6():
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:73
+    OCR1A = 1249;              // 1ms period
+    TIMSK |= (1 << OCIE1A);    // Habilitar interrupção
+}
+//Dummy counter, not used
+volatile uint32_t ms_counter = 0;
+ISR(TIMER1_COMPA_vect) {
+ 490:	1f 92       	push	r1
+ 492:	0f 92       	push	r0
+ 494:	0f b6       	in	r0, 0x3f	; 63
+ 496:	0f 92       	push	r0
+ 498:	11 24       	eor	r1, r1
+ 49a:	8f 93       	push	r24
+ 49c:	9f 93       	push	r25
+ 49e:	af 93       	push	r26
+ 4a0:	bf 93       	push	r27
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:74
+  ms_counter++;
+ 4a2:	80 91 a8 00 	lds	r24, 0x00A8	; 0x8000a8 <__data_end>
+ 4a6:	90 91 a9 00 	lds	r25, 0x00A9	; 0x8000a9 <__data_end+0x1>
+ 4aa:	a0 91 aa 00 	lds	r26, 0x00AA	; 0x8000aa <__data_end+0x2>
+ 4ae:	b0 91 ab 00 	lds	r27, 0x00AB	; 0x8000ab <__data_end+0x3>
+ 4b2:	01 96       	adiw	r24, 0x01	; 1
+ 4b4:	a1 1d       	adc	r26, r1
+ 4b6:	b1 1d       	adc	r27, r1
+ 4b8:	80 93 a8 00 	sts	0x00A8, r24	; 0x8000a8 <__data_end>
+ 4bc:	90 93 a9 00 	sts	0x00A9, r25	; 0x8000a9 <__data_end+0x1>
+ 4c0:	a0 93 aa 00 	sts	0x00AA, r26	; 0x8000aa <__data_end+0x2>
+ 4c4:	b0 93 ab 00 	sts	0x00AB, r27	; 0x8000ab <__data_end+0x3>
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:76
+  //start_irq(1);  // Gera IRQ nível 6
+}
+ 4c8:	bf 91       	pop	r27
+ 4ca:	af 91       	pop	r26
+ 4cc:	9f 91       	pop	r25
+ 4ce:	8f 91       	pop	r24
+ 4d0:	0f 90       	pop	r0
+ 4d2:	0f be       	out	0x3f, r0	; 63
+ 4d4:	0f 90       	pop	r0
+ 4d6:	1f 90       	pop	r1
+ 4d8:	18 95       	reti
+
+000004da <global constructors keyed to 65535_0_interruptCntrl.ino.cpp.o.1785>:
+_GLOBAL__I_65535_0_interruptCntrl.ino.cpp.o.1785():
+ 4da:	e5 eb       	ldi	r30, 0xB5	; 181
+ 4dc:	f0 e0       	ldi	r31, 0x00	; 0
+ 4de:	13 82       	std	Z+3, r1	; 0x03
+ 4e0:	12 82       	std	Z+2, r1	; 0x02
+ 4e2:	88 ee       	ldi	r24, 0xE8	; 232
+ 4e4:	93 e0       	ldi	r25, 0x03	; 3
+ 4e6:	a0 e0       	ldi	r26, 0x00	; 0
+ 4e8:	b0 e0       	ldi	r27, 0x00	; 0
+ 4ea:	84 83       	std	Z+4, r24	; 0x04
+ 4ec:	95 83       	std	Z+5, r25	; 0x05
+ 4ee:	a6 83       	std	Z+6, r26	; 0x06
+ 4f0:	b7 83       	std	Z+7, r27	; 0x07
+ 4f2:	8d e6       	ldi	r24, 0x6D	; 109
+ 4f4:	90 e0       	ldi	r25, 0x00	; 0
+ 4f6:	91 83       	std	Z+1, r25	; 0x01
+ 4f8:	80 83       	st	Z, r24
+ 4fa:	80 e4       	ldi	r24, 0x40	; 64
+ 4fc:	90 e0       	ldi	r25, 0x00	; 0
+ 4fe:	95 87       	std	Z+13, r25	; 0x0d
+ 500:	84 87       	std	Z+12, r24	; 0x0c
+ 502:	29 e2       	ldi	r18, 0x29	; 41
+ 504:	30 e0       	ldi	r19, 0x00	; 0
+ 506:	37 87       	std	Z+15, r19	; 0x0f
+ 508:	26 87       	std	Z+14, r18	; 0x0e
+ 50a:	2b e2       	ldi	r18, 0x2B	; 43
+ 50c:	30 e0       	ldi	r19, 0x00	; 0
+ 50e:	31 8b       	std	Z+17, r19	; 0x11
+ 510:	20 8b       	std	Z+16, r18	; 0x10
+ 512:	2a e2       	ldi	r18, 0x2A	; 42
+ 514:	30 e0       	ldi	r19, 0x00	; 0
+ 516:	33 8b       	std	Z+19, r19	; 0x13
+ 518:	22 8b       	std	Z+18, r18	; 0x12
+ 51a:	95 8b       	std	Z+21, r25	; 0x15
+ 51c:	84 8b       	std	Z+20, r24	; 0x14
+ 51e:	8c e2       	ldi	r24, 0x2C	; 44
+ 520:	90 e0       	ldi	r25, 0x00	; 0
+ 522:	97 8b       	std	Z+23, r25	; 0x17
+ 524:	86 8b       	std	Z+22, r24	; 0x16
+ 526:	11 8e       	std	Z+25, r1	; 0x19
+ 528:	12 8e       	std	Z+26, r1	; 0x1a
+ 52a:	13 8e       	std	Z+27, r1	; 0x1b
+ 52c:	14 8e       	std	Z+28, r1	; 0x1c
+ 52e:	e9 dd       	rcall	.-1070   	; 0x102 <millis>
+ 530:	6c 59       	subi	r22, 0x9C	; 156
+ 532:	7f 4f       	sbci	r23, 0xFF	; 255
+ 534:	8f 4f       	sbci	r24, 0xFF	; 255
+ 536:	9f 4f       	sbci	r25, 0xFF	; 255
+ 538:	60 93 52 01 	sts	0x0152, r22	; 0x800152 <timer1>
+ 53c:	70 93 53 01 	sts	0x0153, r23	; 0x800153 <timer1+0x1>
+ 540:	80 93 54 01 	sts	0x0154, r24	; 0x800154 <timer1+0x2>
+ 544:	90 93 55 01 	sts	0x0155, r25	; 0x800155 <timer1+0x3>
+ 548:	dc cd       	rjmp	.-1096   	; 0x102 <millis>
+
+0000054a <main>:
+main():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:945
+
+void init()
+{
+  // this needs to be called before setup() or some functions won't
+  // work there
+  sei();
+ 54a:	78 94       	sei
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:966
+#if defined(__AVR_ATmega64__) || defined(__AVR_ATmega128__)
+  // CPU specific: different values for the ATmega64/128
+  TCCR0 |= _BV(WGM01) | _BV(WGM00) | _BV(CS02);
+#elif defined(TCCR0) && defined(CS01) && defined(CS00)
+  // This combination is for the ATmega8535, ATmega8, ATmega16, ATmega32, ATmega8515, ATmega162
+  TCCR0 |= _BV(CS01) | _BV(CS00);
+ 54c:	83 b7       	in	r24, 0x33	; 51
+ 54e:	83 60       	ori	r24, 0x03	; 3
+ 550:	83 bf       	out	0x33, r24	; 51
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:982
+  #error Timer 0 prescale factor 64 not set correctly
+#endif
+
+// Enable timer 0 overflow interrupt
+#if defined(TIMSK) && defined(TOIE0)
+  TIMSK |= _BV(TOIE0);
+ 552:	89 b7       	in	r24, 0x39	; 57
+ 554:	81 60       	ori	r24, 0x01	; 1
+ 556:	89 bf       	out	0x39, r24	; 57
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:995
+// this is better for motors as it ensures an even waveform
+// note, however, that fast pwm mode can achieve a frequency of up
+// 8 MHz (with a 16 MHz clock) at 50% duty cycle
+
+#if defined(TCCR1B) && defined(CS11) && defined(CS10)
+  TCCR1B = _BV(CS11); // Set timer 1 prescale factor to 64
+ 558:	92 e0       	ldi	r25, 0x02	; 2
+ 55a:	9e bd       	out	0x2e, r25	; 46
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:997
+#if F_CPU >= 8000000L
+  TCCR1B |= _BV(CS10);
+ 55c:	8e b5       	in	r24, 0x2e	; 46
+ 55e:	81 60       	ori	r24, 0x01	; 1
+ 560:	8e bd       	out	0x2e, r24	; 46
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:1006
+#if F_CPU >= 8000000L
+  TCCR1 |= _BV(CS10);
+#endif
+#endif
+#if defined(TCCR1A) && defined(WGM10)
+  TCCR1A |= _BV(WGM10); // Put timer 1 in 8-bit phase correct pwm mode
+ 562:	8f b5       	in	r24, 0x2f	; 47
+ 564:	81 60       	ori	r24, 0x01	; 1
+ 566:	8f bd       	out	0x2f, r24	; 47
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:1011
+#endif
+
+// Set timer 2 prescale factor to 64
+#if defined(TCCR2) && defined(CS22)
+  TCCR2 |= _BV(CS22);
+ 568:	85 b5       	in	r24, 0x25	; 37
+ 56a:	84 60       	ori	r24, 0x04	; 4
+ 56c:	85 bd       	out	0x25, r24	; 37
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:1020
+  TCCR2A |= _BV(CS22);
+#endif
+
+// Configure timer 2 for phase correct pwm (8-bit)
+#if defined(TCCR2) && defined(WGM20)
+  TCCR2 |= _BV(WGM20);
+ 56e:	85 b5       	in	r24, 0x25	; 37
+ 570:	80 64       	ori	r24, 0x40	; 64
+ 572:	85 bd       	out	0x25, r24	; 37
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:1050
+#endif
+
+#if defined(ADCSRA)
+  // set a2d prescaler so we are inside the desired 50-200 KHz range.
+  #if F_CPU >= 16000000 // 16 MHz / 128 = 125 KHz
+    ADCSRA = _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0) | _BV(ADEN);
+ 574:	87 e8       	ldi	r24, 0x87	; 135
+ 576:	86 b9       	out	0x06, r24	; 6
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:1068
+
+  // The bootloader connects pins 0 and 1 to the USART; disconnect them
+  // here so they can be used as normal digital i/o; they will be
+  // reconnected in Serial.begin()
+#if defined(UCSRB)
+  UCSRB = 0;
+ 578:	1a b8       	out	0x0a, r1	; 10
+begin():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:121
+
+void HardwareSerial::begin(unsigned long baud, byte config)
+{
+  // Try u2x mode first
+  uint16_t baud_setting = (F_CPU / 4 / baud - 1) / 2;
+  *_ucsra = 1 << U2X0;
+ 57a:	e0 91 c5 00 	lds	r30, 0x00C5	; 0x8000c5 <Serial+0x10>
+ 57e:	f0 91 c6 00 	lds	r31, 0x00C6	; 0x8000c6 <Serial+0x11>
+ 582:	90 83       	st	Z, r25
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:135
+    *_ucsra = 0;
+    baud_setting = (F_CPU / 8 / baud - 1) / 2;
+  }
+
+  // assign the baud_setting, a.k.a. ubrr (USART Baud Rate Register)
+  *_ubrrh = baud_setting >> 8;
+ 584:	e0 91 c1 00 	lds	r30, 0x00C1	; 0x8000c1 <Serial+0xc>
+ 588:	f0 91 c2 00 	lds	r31, 0x00C2	; 0x8000c2 <Serial+0xd>
+ 58c:	10 82       	st	Z, r1
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:136
+  *_ubrrl = baud_setting;
+ 58e:	e0 91 c3 00 	lds	r30, 0x00C3	; 0x8000c3 <Serial+0xe>
+ 592:	f0 91 c4 00 	lds	r31, 0x00C4	; 0x8000c4 <Serial+0xf>
+ 596:	8f ec       	ldi	r24, 0xCF	; 207
+ 598:	80 83       	st	Z, r24
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:138
+
+  _written = false;
+ 59a:	10 92 cd 00 	sts	0x00CD, r1	; 0x8000cd <Serial+0x18>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:146
+#if defined(__AVR_ATmega8__) || defined(__AVR_ATmega8515__) || defined(__AVR_ATmega162__) \
+|| defined(__AVR_ATmega8535__) || defined(__AVR_ATmega16__)|| defined(__AVR_ATmega32__)   \
+|| defined(__AVR_ATmega162__)
+  config |= 0x80; // select UCSRC register (shared with UBRRH)
+#endif
+  *_ucsrc = config;
+ 59e:	e0 91 c9 00 	lds	r30, 0x00C9	; 0x8000c9 <Serial+0x14>
+ 5a2:	f0 91 ca 00 	lds	r31, 0x00CA	; 0x8000ca <Serial+0x15>
+ 5a6:	86 e8       	ldi	r24, 0x86	; 134
+ 5a8:	80 83       	st	Z, r24
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:148
+  
+  *_ucsrb |= _BV(RXEN0) | _BV(TXEN0) | _BV(RXCIE0);
+ 5aa:	e0 91 c7 00 	lds	r30, 0x00C7	; 0x8000c7 <Serial+0x12>
+ 5ae:	f0 91 c8 00 	lds	r31, 0x00C8	; 0x8000c8 <Serial+0x13>
+ 5b2:	80 81       	ld	r24, Z
+ 5b4:	88 69       	ori	r24, 0x98	; 152
+ 5b6:	80 83       	st	Z, r24
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/HardwareSerial.cpp:149
+  *_ucsrb &= ~_BV(UDRIE0);
+ 5b8:	e0 91 c7 00 	lds	r30, 0x00C7	; 0x8000c7 <Serial+0x12>
+ 5bc:	f0 91 c8 00 	lds	r31, 0x00C8	; 0x8000c8 <Serial+0x13>
+ 5c0:	80 81       	ld	r24, Z
+ 5c2:	8f 7d       	andi	r24, 0xDF	; 223
+ 5c4:	80 83       	st	Z, r24
+write():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/Print.h:54
+    void clearWriteError() { setWriteError(0); }
+
+    virtual size_t write(uint8_t) = 0;
+    size_t write(const char *str) {
+      if (str == NULL) return 0;
+      return write((const uint8_t *)str, strlen(str));
+ 5c6:	49 e2       	ldi	r20, 0x29	; 41
+ 5c8:	50 e0       	ldi	r21, 0x00	; 0
+ 5ca:	6b e7       	ldi	r22, 0x7B	; 123
+ 5cc:	70 e0       	ldi	r23, 0x00	; 0
+ 5ce:	85 eb       	ldi	r24, 0xB5	; 181
+ 5d0:	90 e0       	ldi	r25, 0x00	; 0
+ 5d2:	a3 dd       	rcall	.-1210   	; 0x11a <Print::write(unsigned char const*, unsigned int)>
+ 5d4:	42 e0       	ldi	r20, 0x02	; 2
+ 5d6:	50 e0       	ldi	r21, 0x00	; 0
+ 5d8:	65 ea       	ldi	r22, 0xA5	; 165
+ 5da:	70 e0       	ldi	r23, 0x00	; 0
+ 5dc:	85 eb       	ldi	r24, 0xB5	; 181
+ 5de:	90 e0       	ldi	r25, 0x00	; 0
+ 5e0:	9c dd       	rcall	.-1224   	; 0x11a <Print::write(unsigned char const*, unsigned int)>
+setup_ports():
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:49
+#define LED_PORT PORTB
+
+// Configuração dos ports
+void setup_ports() {
+    // Configurar PC0-PC2 como saídas (IPL0-IPL2)
+    DDRC |= (1 << IPL0) | (1 << IPL1) | (1 << IPL2) ;
+ 5e2:	84 b3       	in	r24, 0x14	; 20
+ 5e4:	87 60       	ori	r24, 0x07	; 7
+ 5e6:	84 bb       	out	0x14, r24	; 20
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:51
+    // VPA inicialmente inativo    
+    PORTC |=  (1 << IPL0) | (1 << IPL1) | (1 << IPL2) ;  
+ 5e8:	85 b3       	in	r24, 0x15	; 21
+ 5ea:	87 60       	ori	r24, 0x07	; 7
+ 5ec:	85 bb       	out	0x15, r24	; 21
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:54
+    
+    // Configurar PB1 como saída (OC1A - Debug) LED
+    DDRB |= (1 << PB1)|(1 << PB5)  ;
+ 5ee:	87 b3       	in	r24, 0x17	; 23
+ 5f0:	82 62       	ori	r24, 0x22	; 34
+ 5f2:	87 bb       	out	0x17, r24	; 23
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:57
+
+    // Configura PD0-PD5 como entradas com pull-up
+    DDRD &= ~ALL_IRQ_MASK;
+ 5f4:	81 b3       	in	r24, 0x11	; 17
+ 5f6:	83 70       	andi	r24, 0x03	; 3
+ 5f8:	81 bb       	out	0x11, r24	; 17
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:58
+    PORTD |= ALL_IRQ_MASK;    
+ 5fa:	82 b3       	in	r24, 0x12	; 18
+ 5fc:	8c 6f       	ori	r24, 0xFC	; 252
+ 5fe:	82 bb       	out	0x12, r24	; 18
+setup_timer1():
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:66
+/*
+  Gerando o sinal de 100HZ no pino PB1
+  Usado para gerar interrupção 7 no 68000
+*/
+void setup_timer1() {
+    TCCR1A = (1 << COM1A0);    // Toggle OC1A on compare match
+ 600:	80 e4       	ldi	r24, 0x40	; 64
+ 602:	8f bd       	out	0x2f, r24	; 47
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:67
+    TCCR1B = (1 << WGM12) | (1 << CS11)  | (1 << CS10);  // CTC mode, prescaler 8
+ 604:	8b e0       	ldi	r24, 0x0B	; 11
+ 606:	8e bd       	out	0x2e, r24	; 46
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:68
+    OCR1A = 1249;              // 1ms period
+ 608:	81 ee       	ldi	r24, 0xE1	; 225
+ 60a:	94 e0       	ldi	r25, 0x04	; 4
+ 60c:	9b bd       	out	0x2b, r25	; 43
+ 60e:	8a bd       	out	0x2a, r24	; 42
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:69
+    TIMSK |= (1 << OCIE1A);    // Habilitar interrupção
+ 610:	89 b7       	in	r24, 0x39	; 57
+ 612:	80 61       	ori	r24, 0x10	; 16
+ 614:	89 bf       	out	0x39, r24	; 57
+setup():
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:156
+
+  //Setup interrups
+  setup_timer1();
+  //setup_timer2();
+
+  sei();
+ 616:	78 94       	sei
+pinMode():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring_digital.c:31
+#include "wiring_private.h"
+#include "pins_arduino.h"
+
+void pinMode(uint8_t pin, uint8_t mode)
+{
+  uint8_t bit = digitalPinToBitMask(pin);
+ 618:	ee e5       	ldi	r30, 0x5E	; 94
+ 61a:	f0 e0       	ldi	r31, 0x00	; 0
+ 61c:	24 91       	lpm	r18, Z
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring_digital.c:32
+  uint8_t port = digitalPinToPort(pin);
+ 61e:	e7 e4       	ldi	r30, 0x47	; 71
+ 620:	f0 e0       	ldi	r31, 0x00	; 0
+ 622:	84 91       	lpm	r24, Z
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring_digital.c:35
+  volatile uint8_t *reg, *out;
+
+  if (port == NOT_A_PIN) return;
+ 624:	88 23       	and	r24, r24
+ 626:	99 f0       	breq	.+38     	; 0x64e <main+0x104>
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring_digital.c:38
+
+  // JWS: can I let the optimizer do this?
+  reg = portModeRegister(port);
+ 628:	90 e0       	ldi	r25, 0x00	; 0
+ 62a:	88 0f       	add	r24, r24
+ 62c:	99 1f       	adc	r25, r25
+ 62e:	fc 01       	movw	r30, r24
+ 630:	e0 5d       	subi	r30, 0xD0	; 208
+ 632:	ff 4f       	sbci	r31, 0xFF	; 255
+ 634:	a5 91       	lpm	r26, Z+
+ 636:	b4 91       	lpm	r27, Z
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring_digital.c:39
+  out = portOutputRegister(port);
+ 638:	fc 01       	movw	r30, r24
+ 63a:	ea 5d       	subi	r30, 0xDA	; 218
+ 63c:	ff 4f       	sbci	r31, 0xFF	; 255
+ 63e:	85 91       	lpm	r24, Z+
+ 640:	94 91       	lpm	r25, Z
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring_digital.c:54
+    cli();
+    *reg &= ~bit;
+    *out |= bit;
+    SREG = oldSREG;
+  } else {
+    uint8_t oldSREG = SREG;
+ 642:	8f b7       	in	r24, 0x3f	; 63
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring_digital.c:55
+    cli();
+ 644:	f8 94       	cli
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring_digital.c:56
+    *reg |= bit;
+ 646:	ec 91       	ld	r30, X
+ 648:	e2 2b       	or	r30, r18
+ 64a:	ec 93       	st	X, r30
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring_digital.c:57
+    SREG = oldSREG;
+ 64c:	8f bf       	out	0x3f, r24	; 63
+setup():
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:158
+  pinMode(LED_BUILTIN, OUTPUT);    
+  timer1=millis()+TIMEOUT;
+ 64e:	59 dd       	rcall	.-1358   	; 0x102 <millis>
+ 650:	68 51       	subi	r22, 0x18	; 24
+ 652:	7c 4f       	sbci	r23, 0xFC	; 252
+ 654:	8f 4f       	sbci	r24, 0xFF	; 255
+ 656:	9f 4f       	sbci	r25, 0xFF	; 255
+ 658:	60 93 52 01 	sts	0x0152, r22	; 0x800152 <timer1>
+ 65c:	70 93 53 01 	sts	0x0153, r23	; 0x800153 <timer1+0x1>
+ 660:	80 93 54 01 	sts	0x0154, r24	; 0x800154 <timer1+0x2>
+ 664:	90 93 55 01 	sts	0x0155, r25	; 0x800155 <timer1+0x3>
+delay():
+/home/pdsilva/.arduino15/packages/MiniCore/hardware/avr/3.1.3/cores/MCUdude_corefiles/wiring.c:397
+#endif // 0
+}
+
+void delay(unsigned long ms)
+{
+  unsigned long start = micros();
+ 668:	26 dd       	rcall	.-1460   	; 0xb6 <micros>
+loop():
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:171
+    start_irq(get_irq_started());
+
+    //Activity led
+    if ( (millis() > timer1) ){
+      timer1=millis()+500;
+      LED_PORT ^= (1 << LED_PIN);  // toggle LED
+ 66a:	c0 e2       	ldi	r28, 0x20	; 32
+check_irq_pins_status():
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:102
+ISR(INT0_vect) {
+
+}
+
+uint8_t check_irq_pins_status() {
+    return (~PIND) & ALL_IRQ_MASK;
+ 66c:	80 b3       	in	r24, 0x10	; 16
+ 66e:	80 95       	com	r24
+get_irq_started():
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:117
+          int1 send 6
+       no int  send 7 
+*/
+uint8_t get_irq_started() {
+    uint8_t status = check_irq_pins_status();
+    if (status & (1<<IRQ7_PIN)) return 0;
+ 670:	87 fd       	sbrc	r24, 7
+ 672:	29 c0       	rjmp	.+82     	; 0x6c6 <main+0x17c>
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:118
+    if (status & (1<<IRQ5_PIN)) return 2;
+ 674:	86 fd       	sbrc	r24, 6
+ 676:	5c c0       	rjmp	.+184    	; 0x730 <main+0x1e6>
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:119
+    if (status & (1<<IRQ4_PIN)) return 3;
+ 678:	85 fd       	sbrc	r24, 5
+ 67a:	5c c0       	rjmp	.+184    	; 0x734 <main+0x1ea>
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:120
+    if (status & (1<<IRQ3_PIN)) return 4;
+ 67c:	84 fd       	sbrc	r24, 4
+ 67e:	5c c0       	rjmp	.+184    	; 0x738 <main+0x1ee>
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:121
+    if (status & (1<<IRQ2_PIN)) return 5;
+ 680:	83 fd       	sbrc	r24, 3
+ 682:	5c c0       	rjmp	.+184    	; 0x73c <main+0x1f2>
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:122
+    if (status & (1<<IRQ1_PIN)) return 6;
+ 684:	82 fd       	sbrc	r24, 2
+ 686:	5c c0       	rjmp	.+184    	; 0x740 <main+0x1f6>
+loop():
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:169
+  while(1) {
+    // 1️⃣ Verificação SÍNCRONA das IRQs
+    start_irq(get_irq_started());
+
+    //Activity led
+    if ( (millis() > timer1) ){
+ 688:	3c dd       	rcall	.-1416   	; 0x102 <millis>
+ 68a:	00 91 52 01 	lds	r16, 0x0152	; 0x800152 <timer1>
+ 68e:	10 91 53 01 	lds	r17, 0x0153	; 0x800153 <timer1+0x1>
+ 692:	20 91 54 01 	lds	r18, 0x0154	; 0x800154 <timer1+0x2>
+ 696:	30 91 55 01 	lds	r19, 0x0155	; 0x800155 <timer1+0x3>
+ 69a:	06 17       	cp	r16, r22
+ 69c:	17 07       	cpc	r17, r23
+ 69e:	28 07       	cpc	r18, r24
+ 6a0:	39 07       	cpc	r19, r25
+ 6a2:	20 f7       	brcc	.-56     	; 0x66c <main+0x122>
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:170
+      timer1=millis()+500;
+ 6a4:	2e dd       	rcall	.-1444   	; 0x102 <millis>
+ 6a6:	6c 50       	subi	r22, 0x0C	; 12
+ 6a8:	7e 4f       	sbci	r23, 0xFE	; 254
+ 6aa:	8f 4f       	sbci	r24, 0xFF	; 255
+ 6ac:	9f 4f       	sbci	r25, 0xFF	; 255
+ 6ae:	60 93 52 01 	sts	0x0152, r22	; 0x800152 <timer1>
+ 6b2:	70 93 53 01 	sts	0x0153, r23	; 0x800153 <timer1+0x1>
+ 6b6:	80 93 54 01 	sts	0x0154, r24	; 0x800154 <timer1+0x2>
+ 6ba:	90 93 55 01 	sts	0x0155, r25	; 0x800155 <timer1+0x3>
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:171
+      LED_PORT ^= (1 << LED_PIN);  // toggle LED
+ 6be:	88 b3       	in	r24, 0x18	; 24
+ 6c0:	8c 27       	eor	r24, r28
+ 6c2:	88 bb       	out	0x18, r24	; 24
+ 6c4:	d3 cf       	rjmp	.-90     	; 0x66c <main+0x122>
+main():
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:117
+          int1 send 6
+       no int  send 7 
+*/
+uint8_t get_irq_started() {
+    uint8_t status = check_irq_pins_status();
+    if (status & (1<<IRQ7_PIN)) return 0;
+ 6c6:	80 e0       	ldi	r24, 0x00	; 0
+start_irq():
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:140
+  irq_s[active_irq]=NOT_ACTIVE;
+}
+
+void start_irq(uint8_t new_irq){
+  if(new_irq == NOT_ACTIVE) return; //excesso de zelo quando estiver funcionando corretamente tirar isso daqui
+  if (new_irq < 7 && irq_s[new_irq] == NOT_ACTIVE) {
+ 6c8:	e8 2f       	mov	r30, r24
+ 6ca:	f0 e0       	ldi	r31, 0x00	; 0
+ 6cc:	ef 59       	subi	r30, 0x9F	; 159
+ 6ce:	ff 4f       	sbci	r31, 0xFF	; 255
+ 6d0:	20 81       	ld	r18, Z
+ 6d2:	27 30       	cpi	r18, 0x07	; 7
+ 6d4:	c9 f6       	brne	.-78     	; 0x688 <main+0x13e>
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:141
+    active_irq = new_irq;
+ 6d6:	80 93 60 00 	sts	0x0060, r24	; 0x800060 <__DATA_REGION_ORIGIN__>
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:142
+    irq_s[active_irq]=active_irq;
+ 6da:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <__DATA_REGION_ORIGIN__>
+ 6de:	e0 91 60 00 	lds	r30, 0x0060	; 0x800060 <__DATA_REGION_ORIGIN__>
+ 6e2:	f0 e0       	ldi	r31, 0x00	; 0
+ 6e4:	ef 59       	subi	r30, 0x9F	; 159
+ 6e6:	ff 4f       	sbci	r31, 0xFF	; 255
+ 6e8:	80 83       	st	Z, r24
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:143
+    set_ipl(active_irq);
+ 6ea:	80 91 60 00 	lds	r24, 0x0060	; 0x800060 <__DATA_REGION_ORIGIN__>
+set_ipl():
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:129
+}
+
+// ✅ Função set and reset IPLx
+void set_ipl(uint8_t level) {
+  level &= 0x07;
+  PORTC = (PORTC & 0xF8) | level;  // Seta nível
+ 6ee:	95 b3       	in	r25, 0x15	; 21
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:128
+    return NOT_ACTIVE;
+}
+
+// ✅ Função set and reset IPLx
+void set_ipl(uint8_t level) {
+  level &= 0x07;
+ 6f0:	87 70       	andi	r24, 0x07	; 7
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:129
+  PORTC = (PORTC & 0xF8) | level;  // Seta nível
+ 6f2:	98 7f       	andi	r25, 0xF8	; 248
+ 6f4:	89 2b       	or	r24, r25
+ 6f6:	85 bb       	out	0x15, r24	; 21
+	...
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:133
+  // ⏰ Timing calibrado manualmente
+    __asm__ volatile("nop\nnop\nnop\nnop\nnop\nnop\nnop\nnop\nnop\nnop\nnop\nnop");
+
+  PORTC = (PORTC & 0xF8) | NOT_ACTIVE;  // Limpa ANTES do retrigger
+ 710:	85 b3       	in	r24, 0x15	; 21
+ 712:	87 60       	ori	r24, 0x07	; 7
+ 714:	85 bb       	out	0x15, r24	; 21
+_delay_us():
+/home/pdsilva/.arduino15/packages/arduino/tools/avr-gcc/7.3.0-atmel3.6.1-arduino7/avr/include/util/delay.h:276
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
+
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 716:	8f ec       	ldi	r24, 0xCF	; 207
+ 718:	97 e0       	ldi	r25, 0x07	; 7
+ 71a:	01 97       	sbiw	r24, 0x01	; 1
+ 71c:	f1 f7       	brne	.-4      	; 0x71a <main+0x1d0>
+ 71e:	00 c0       	rjmp	.+0      	; 0x720 <main+0x1d6>
+ 720:	00 00       	nop
+set_ipl():
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:135
+  _delay_us(500);
+  irq_s[active_irq]=NOT_ACTIVE;
+ 722:	e0 91 60 00 	lds	r30, 0x0060	; 0x800060 <__DATA_REGION_ORIGIN__>
+ 726:	f0 e0       	ldi	r31, 0x00	; 0
+ 728:	ef 59       	subi	r30, 0x9F	; 159
+ 72a:	ff 4f       	sbci	r31, 0xFF	; 255
+ 72c:	20 83       	st	Z, r18
+ 72e:	ac cf       	rjmp	.-168    	; 0x688 <main+0x13e>
+main():
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:118
+       no int  send 7 
+*/
+uint8_t get_irq_started() {
+    uint8_t status = check_irq_pins_status();
+    if (status & (1<<IRQ7_PIN)) return 0;
+    if (status & (1<<IRQ5_PIN)) return 2;
+ 730:	82 e0       	ldi	r24, 0x02	; 2
+ 732:	ca cf       	rjmp	.-108    	; 0x6c8 <main+0x17e>
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:119
+    if (status & (1<<IRQ4_PIN)) return 3;
+ 734:	83 e0       	ldi	r24, 0x03	; 3
+ 736:	c8 cf       	rjmp	.-112    	; 0x6c8 <main+0x17e>
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:120
+    if (status & (1<<IRQ3_PIN)) return 4;
+ 738:	84 e0       	ldi	r24, 0x04	; 4
+ 73a:	c6 cf       	rjmp	.-116    	; 0x6c8 <main+0x17e>
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:121
+    if (status & (1<<IRQ2_PIN)) return 5;
+ 73c:	85 e0       	ldi	r24, 0x05	; 5
+ 73e:	c4 cf       	rjmp	.-120    	; 0x6c8 <main+0x17e>
+/home/pdsilva/Projects/Orion/OrionBios/peripheral/atmega8/interruptCntrl/interruptCntrl.ino:122
+    if (status & (1<<IRQ1_PIN)) return 6;
+ 740:	86 e0       	ldi	r24, 0x06	; 6
+ 742:	c2 cf       	rjmp	.-124    	; 0x6c8 <main+0x17e>
+
+00000744 <__tablejump2__>:
+__tablejump2__():
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2296
+ 744:	ee 0f       	add	r30, r30
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2297
+ 746:	ff 1f       	adc	r31, r31
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2328
+ 748:	05 90       	lpm	r0, Z+
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2329
+ 74a:	f4 91       	lpm	r31, Z
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2330
+ 74c:	e0 2d       	mov	r30, r0
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2331
+ 74e:	09 94       	ijmp
+
+00000750 <_exit>:
+exit():
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2278
+ 750:	f8 94       	cli
+
+00000752 <__stop_program>:
+__stop_program():
+/home/jenkins/workspace/avr-gcc-staging/label/debian7-x86_64/gcc-build/avr/avr4/libgcc/../../../../gcc/libgcc/config/avr/lib1funcs.S:2280
+ 752:	ff cf       	rjmp	.-2      	; 0x752 <__stop_program>

@@ -5,7 +5,7 @@
  *   Pico, o m68k TRAVA no acesso em vez de receber um erro. Por isso
  *   cada acesso ao hardware e precedido de uma mensagem, e a ULTIMA
  *   linha impressa antes de um travamento mostra onde ele ficou preso.
- *   con_putchar() deve retornar so depois de o caractere ter sido enviado
+ *   putcharhar() deve retornar so depois de o caractere ter sido enviado
  *   (espere o TX esvaziar), senao a ultima mensagem pode se perder.
  *
  * Etapas (da mais simples para a mais completa):
@@ -73,7 +73,7 @@ Refiz o ide_test.c. Não compilei nem rodei esse programa, então ele ainda é l
 
 O que mudou por causa do que li no PIO e no ide_config.h:
 
-Mensagem antes de cada acesso. Como não há timeout de DTACK, uma falha trava o 68k em vez de dar erro. A última linha impressa antes do travamento mostra onde ele ficou preso. Por isso o con_putchar() precisa esperar o TX esvaziar antes de retornar.
+Mensagem antes de cada acesso. Como não há timeout de DTACK, uma falha trava o 68k em vez de dar erro. A última linha impressa antes do travamento mostra onde ele ficou preso. Por isso o putcharhar() precisa esperar o TX esvaziar antes de retornar.
 Pausa depois de cada escrita (settle()). Isso contorna um problema que descobri agora (item abaixo).
 Etapa 1 lê o STATUS 8 vezes seguidas e confere se o valor é estável.
 Etapa 2 testa dois conjuntos de valores, um deles com os complementos, para pegar bit preso.
@@ -82,7 +82,7 @@ IDE_STAGES limita até qual etapa rodar, e TEST_LBA escolhe o setor.
 
 Um quinto problema no firmware, que se soma aos quatro de antes: no ide_taskfile, a escrita faz irq set 0 e libera o DTACK sem esperar a ISR. Se o 68k lê logo depois de escrever, o pedido de leitura entra no FIFO enquanto o handler de escrita ainda está drenando, e o handler o consome como se fosse uma escrita. O PIO então fica parado no pull esperando um valor que nunca vem, e o 68k trava. Pelo que sei da PIO, a correção é trocar irq set 0 por irq wait 0 no do_write do ide_taskfile, o que segura o DTACK até a ISR atualizar o registrador e limpar o flag. O handler que você já tem faz o pio_interrupt_clear(g_pio, 0) no fim, então não precisa mudar. Com ou sem isso, o settle() do teste reduz a chance de a corrida acontecer. Num 68k rápido, a corrida volta.
 
-Para rodar, ajuste: IDE_BASE (endereço real no seu mapa), con_putchar() e IDE_BYTE_LANE (1 se os D0-D7 do task file caem em D7-D0 do 68k, 0 se caem em D15-D8).
+Para rodar, ajuste: IDE_BASE (endereço real no seu mapa), putcharhar() e IDE_BYTE_LANE (1 se os D0-D7 do task file caem em D7-D0 do 68k, 0 se caem em D15-D8).
 
 Se o 68k congelar, me diga qual foi a última linha impressa.
 
@@ -99,7 +99,7 @@ Se o 68k congelar, me diga qual foi a última linha impressa.
                                          D7-D0. O task file usa D0-D7 do
                                          RP2350: se isso cai em D7-D0 do 68k,
                                          use 1; se cai em D15-D8, use 0.        */
-#define IDE_STAGES      6             /* roda ate esta etapa (1, 2, 3 ou 4)        */
+#define IDE_STAGES      7             /* roda ate esta etapa (1, 2, 3 ou 4)        */
 #define TEST_LBA        0UL           /* setor a ler (< 0x1000000)              */
 #define TIMEOUT         500000UL      /* iteracoes de polling                   */
 #define SETTLE_LOOPS    300           /* pausa apos cada escrita (ver abaixo)   */
@@ -161,7 +161,7 @@ static uint32_t le32(const uint8_t *p) {
  * necessaria, mas nao atrapalha. */
 static void settle(void) { for (volatile int i = 0; i < SETTLE_LOOPS; i++) { } }
 
-static void    wr(uint8_t reg, uint8_t v){ 
+static void wr(uint8_t reg, uint8_t v){ 
     REG8(reg) = v; 
     settle(); 
 }
@@ -197,7 +197,6 @@ static int stage1_status(void) {
     }else{
         printf(" instavel\n");
     }
-    
 
     if (s == 0xFF || s == 0x00) {
         printf("    0xFF/0x00: barramento flutuando ou byte lane errado"); crlf();
@@ -697,6 +696,152 @@ static int stage6_multi(void) {
     return 1;
 }
 
+
+/* ============================================================================
+ * ETAPA 7 do ide_test.c: IDENTIFY DEVICE (0xEC)
+ * ============================================================================
+ * Cole depois da etapa 6 (usa q_wait_drq, q_wait_idle, q_read_multi, multi_rd,
+ * same_bytes e sector_a), antes do main(). No main(), depois da etapa 6:
+ *     if (!stage7_identify()) return 7;
+ *
+ * O firmware precisa ter o ide_patch_identify.c aplicado e regravado
+ * (confira a string de versao na serial).
+ *
+ * O QUE ESTA ETAPA TESTA
+ *   (a) IDENTIFY: 256 words, volta a 0x40, checksum do bloco ok, LBA suportado.
+ *   (b) a capacidade informada: total de setores, em MB e GB.
+ *   (c) le o ULTIMO setor do cartao (LBA total-1): prova que o cartao inteiro
+ *       e enderecavel, nao so os primeiros 8 GB. SO LEITURA, nada e gravado.
+ *   (d) comando nao suportado (READ MULTIPLE, 0xC4) responde ABRT e o Pico
+ *       se recupera: o setor 0 ainda le igual ao da etapa 3.
+ */
+
+#define CMD_IDENTIFY       0xEC
+#define CMD_READ_MULTIPLE  0xC4        /* nao implementado: deve dar ABRT */
+#define PART1_END_SECTORS  0x03B72400UL /* 0x800 + 0x03B71C00, do seu MBR */
+
+static uint8_t id_raw[512];
+
+/* word ATA numero w, montada como um PC faria (byte baixo primeiro) */
+static uint16_t id_word(int w) {
+    return (uint16_t)(id_raw[2 * w] | (id_raw[2 * w + 1] << 8));
+}
+
+/* string ATA: o 1o caractere esta no byte ALTO da word; tira espacos do fim */
+static void id_print_string(int first, int n_words) {
+    char buf[41];
+    int  n = 0;
+    for (int i = 0; i < n_words; i++) {
+        uint16_t w = id_word(first + i);
+        buf[n++] = (char)(w >> 8);
+        buf[n++] = (char)(w & 0xFF);
+    }
+    while (n > 0 && (buf[n - 1] == ' ' || buf[n - 1] == 0)) n--;
+    for (int i = 0; i < n; i++) putchar(buf[i]);
+}
+
+static void dec_u32(uint32_t v) {
+    char t[11];
+    int  n = 0;
+    if (v == 0) { putchar('0'); return; }
+    while (v) { t[n++] = (char)('0' + v % 10); v /= 10; }
+    while (n) putchar(t[--n]);
+}
+
+static int stage7_identify(void) {
+    uint8_t s;
+
+    printf("[7] IDENTIFY DEVICE"); crlf();
+
+    /* (a) o comando */
+    printf("  (a) enviando IDENTIFY DEVICE"); crlf();
+    wr(R_DEVHEAD, 0xE0);
+    wr(R_COMMAND, CMD_IDENTIFY);
+    if (!q_wait_drq(&s)) {
+        printf("    sem DRQ, STATUS=0x"); hex(s, 2);
+        printf(" (ERR com erro 0x04 = o firmware nao tem o patch do IDENTIFY,");
+        crlf();
+        printf("     ou a capacidade do SD nao foi lida)"); crlf();
+        return 0;
+    }
+    {
+        uint16_t *p = (uint16_t *)id_raw;
+        for (int i = 0; i < 256; i++) p[i] = DATA16;
+    }
+    if (!q_wait_idle(&s) || s != ST_DRDY) {
+        printf("    nao voltou a 0x40, STATUS=0x"); hex(s, 2); crlf();
+        return 0;
+    }
+
+    {
+        uint8_t sum = 0;
+        for (int i = 0; i < 512; i++) sum = (uint8_t)(sum + id_raw[i]);
+        if ((id_word(255) & 0xFF) != 0xA5 || sum != 0) {
+            printf("    checksum do bloco INVALIDO (word255=0x"); hex(id_word(255), 4);
+            printf(", soma=0x"); hex(sum, 2); printf(")"); crlf();
+            printf("    se vier tudo com bytes trocados, o bswap do DMA esta errado"); crlf();
+            return 0;
+        }
+    }
+
+    printf("    modelo : "); id_print_string(27, 20); crlf();
+    printf("    serie  : "); id_print_string(10, 10); crlf();
+    printf("    firmware: "); id_print_string(23, 4);  crlf();
+
+    if (!(id_word(49) & 0x0200)) {
+        printf("    word 49 sem o bit de LBA"); crlf();
+        return 0;
+    }
+    printf("    checksum ok, LBA suportado"); crlf();
+
+    /* (b) capacidade */
+    uint32_t total = (uint32_t)id_word(60) | ((uint32_t)id_word(61) << 16);
+    printf("  (b) capacidade: 0x"); hex(total, 8); printf(" setores = ");
+    dec_u32(total); printf(" setores, ");
+    dec_u32(total / 2048u); printf(" MB");
+    crlf();
+    printf("    CHS logico: "); dec_u32(id_word(1)); putchar('/');
+    dec_u32(id_word(3)); putchar('/'); dec_u32(id_word(6)); crlf();
+    if (total < PART1_END_SECTORS) {
+        printf("    MENOR que o fim da 1a particao (0x03B72400): capacidade errada"); crlf();
+        return 0;
+    }
+    printf("    cobre a 1a particao inteira: OK"); crlf();
+
+    /* (c) ultimo setor do cartao */
+    printf("  (c) lendo o ultimo setor, LBA 0x"); hex(total - 1, 8); crlf();
+    if (!q_read_multi(total - 1, 1, &multi_rd[0])) return 0;
+    printf("    ultimo setor lido sem erro: OK"); crlf();
+
+    /* (d) comando nao suportado e recuperacao */
+    printf("  (d) comando nao suportado (READ MULTIPLE, 0xC4)"); crlf();
+    wr(R_COMMAND, CMD_READ_MULTIPLE);
+    {
+        uint32_t t;
+        for (t = TIMEOUT; t; t--) {
+            s = rd(R_STATUS);
+            if (!(s & ST_BSY) && (s & ST_ERR)) break;
+        }
+        if (!t) {
+            printf("    nao respondeu ERR, STATUS=0x"); hex(s, 2); crlf();
+            return 0;
+        }
+        uint8_t e = rd(R_ERROR);
+        if (!(e & 0x04)) {
+            printf("    ERR sem ABRT, ERROR=0x"); hex(e, 2); crlf();
+            return 0;
+        }
+        printf("    respondeu ERR/ABRT como deveria"); crlf();
+    }
+    if (!q_read_multi(0, 1, &multi_rd[0])) return 0;
+    if (!same_bytes(sector_a, multi_rd[0], "setor 0")) return 0;
+    printf("    recuperou: setor 0 le igual ao da etapa 3: OK"); crlf();
+    return 1;
+}
+
+
+
+
 /* chame antes do stage 1 */
 static void recover(void) {
     uint8_t s;
@@ -708,22 +853,43 @@ static void recover(void) {
         q_wait_idle(&s);
     }
 }
+/*
+Ainda não testado:
 
+1. - Gravação num LBA acima de 8 GB. Só tem sentido num setor livre. 
+     A partição ocupa quase o cartão todo, então gravar lá exige cuidado. 
+     Se quiser, escrevo um teste que lê o setor, grava um padrão, 
+     relê e restaura o original, num LBA bem alto.
+     
+2. - Velocidade de leitura e escrita.
+
+3. - O ata.c adaptado rodando de verdade no 68k, com o OrionDOS montando 
+     a partição FAT pelo picoIDE. Esse é o teste que importa para o seu 
+     objetivo. Para ele, chame ata_select_device(ATA_DEV_PICOIDE) antes 
+     do ata_init() ou compile com -DATA_DEFAULT_DEVICE=1.
+
+
+
+
+*/
 int main(void) {
-
-    read_sector(0x0,(uint16_t *) 0x92000);
-    return 0;
-
 
     printf("== teste IDE/RP2350B v2 =="); crlf();
     recover();
+    printf("*************************STAGE 1****************************************\n");
     if (!stage1_status())                         return 1;
+    printf("*************************STAGE 2****************************************\n");
     if (IDE_STAGES >= 2 && !stage2_regs())        return 2;
+    printf("*************************STAGE 3****************************************\n");
     if (IDE_STAGES >= 3 && !stage3_read())        return 3;
+    printf("*************************STAGE 4****************************************\n");
     if (IDE_STAGES >= 4 && !stage4_lba28())       return 4;
+    printf("*************************STAGE 5****************************************\n");
     if (IDE_STAGES >= 5 && !stage5_write())       return 5;
+    printf("*************************STAGE 6****************************************\n");
     if (IDE_STAGES >= 6 && !stage6_multi())       return 6;
-    
+    printf("*************************STAGE 7****************************************\n");
+    if (IDE_STAGES >= 7 && !stage7_identify())    return 7;
 
     printf("fim: tudo certo"); crlf();
     return 0;

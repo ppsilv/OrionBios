@@ -1,0 +1,79 @@
+Pelo que apareceu na saída dos testes, seu prompt é `A:/>`, 
+letra da unidade, diretório atual e `>`. Provavelmente ele 
+já usa o `f_getcwd()`, que o FatFs resolve sozinho quando 
+`FF_VOLUMES` passa de 1. Não vi o código do prompt nem do 
+`ls`, então o que segue é a proposta e o que verificar.
+
+**1. Prompt**
+
+Com duas unidades, o `f_getcwd()` devolve `"0:/dir"` ou 
+`"1:/dir"`. Basta trocar o dígito por letra:
+
+```c
+void shell_prompt(void)
+{
+    char cwd[128];
+    if (f_getcwd(cwd, sizeof cwd) == FR_OK && cwd[1] == ':') {
+        cwd[0] = 'A' + (cwd[0] - '0');   /* 0: -> A:   1: -> B: */
+        printf("%s>", cwd);               /* A:/>   B:/docs> */
+    } else {
+        printf("?:>");                   /* unidade desmontada */
+    }
+}
+```
+
+Se o seu prompt hoje usa um `'A'` fixo, é esse ponto que muda. 
+Sobre o `0:>` depois do `exit`: não sei de onde sai. Provavelmente 
+é o caminho em que o `f_getcwd` falha (volume desmontado) e o seu 
+código imprime o padrão. Com o fallback acima ele passa a mostrar 
+`?:>`, ou você mantém o seu texto.
+
+**2. Trocar de disco**
+
+Digitar `A:` ou `B:` sozinho, como no DOS. É um comando novo no shell:
+
+```c
+int shell_chdrive(char letter)           /* 'A' ou 'B' (maiúscula ou minúscula) */
+{
+    if (letter >= 'a' && letter <= 'z') letter -= 32;
+    char drv[3] = { '0' + (letter - 'A'), ':', 0 };
+    if (letter < 'A' || letter > 'B') { 
+        printf("unknown drive %c:\n", letter); return 1; 
+    }
+
+    if (f_chdir(drv) != FR_OK) {         /* confere que a unidade esta montada */
+        printf("drive %c: not available\n", letter);
+        return 1;
+    }
+    return 0;
+}
+```
+
+No parser de comandos, trate uma linha com dois caracteres `X:` 
+como pedido de troca de unidade.
+
+**3. O `ls` e os outros comandos**
+
+Provavelmente não precisam mudar. O FatFs aceita a unidade dentro do caminho, 
+então:
+- `ls` sem argumento lista a unidade e o diretório atuais.
+- `ls B:/` e `copy A:/arq B:/arq` funcionam sem alteração.
+- Só vai precisar de ajuste se o seu `ls` abrir um caminho com `"0:"` fixo no 
+código (por exemplo `f_opendir(&dir, "0:/")`). Nesse caso troque por `""` ou 
+`"/"` para ele usar a unidade atual.
+
+Cada unidade guarda o seu próprio diretório atual. Se você estiver em `A:/docs`, 
+for para `B:` e voltar com `A:`, estará de volta em `A:/docs`, como no DOS. 
+Isso exige `FF_FS_RPATH` em 2 no `ffconf.h` (o `f_getcwd` precisa disso).
+
+**4. Desmontar no `exit`**
+
+Com duas unidades, desmonte as duas:
+
+```c
+f_mount(NULL, "0:", 0);
+f_mount(NULL, "1:", 0);
+```
+
+Se me mostrar o trecho do shell que monta o prompt, o do `exit` e o do `ls`, eu 
+adapto direto no seu código.
