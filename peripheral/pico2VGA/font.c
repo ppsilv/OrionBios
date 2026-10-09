@@ -17,7 +17,7 @@ static font_t font_8x14_info = {
     .size = 1,            
     .data = font_8x14
 };
-
+/*
 // Instância da fonte 8x16
 static font_t font_8x16_info = {
     .name = "Font 8x16",
@@ -25,6 +25,15 @@ static font_t font_8x16_info = {
     .width = 8,
     .size = 1,            
     .data = font_8x16
+};
+*/
+// Instância da fonte 8x16
+static font_t font_8x16_2_info = {
+    .name = "Font 8x16_2",
+    .height = 16,
+    .width = 8,
+    .size = 1,            
+    .data = font_8x16_2
 };
 
 // Instância da fonte 8x18 (para seus títulos legais)
@@ -45,7 +54,10 @@ font_t * set_font(uint8_t fonte){
              return &font_8x14_info;
              break;
         case FONTE_8X16:
-             return &font_8x16_info;
+       //      return &font_8x16_info;
+             break;
+        case FONTE_8X16_2:
+             return &font_8x16_2_info;
              break;
         case FONTE_8X18:
              return &font_8x18_info;

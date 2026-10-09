@@ -1,7 +1,15 @@
 
 /*
     Version 1.2.25.16.00: Protothreads eliminated now CORE 0 read bus CORE executes bus task arrived.
-
+    Version 1.2.25.17.00: Now it is possible to change the font..
+                          at the beginning the system does:
+                          font = set_font(FONTE_8X16_2);
+                          priv->font.name = font->name;
+                          priv->font.width = font->width ;
+                          priv->font.height= font->height ;
+                          priv->font.size = font->size ;   
+                          priv->font.data = font->data ;
+                          We need just make a function to change this on the fly.  
 */
 #include <stdio.h>
 #include <stdlib.h>
@@ -72,9 +80,9 @@ static void create_timer(bool btimer)
 void video_welcome_screen(){
     vga->setTextCursorPos(0,0);
     vga->setTextColor(RED, BLACK);
-    vga->printString("Orion Vpico2 vga312k   VGA BIOS VRP2350\n");
+    vga->printString("Orion Vpico2 vga312k 2 VGA BIOS VRP2350\n");
     vga->setTextColor(CYAN, BLACK);
-    vga->printString("Version 1.2.25.16.00RA\n"); /*1.0 version 21 week 18 day*/
+    vga->printString("Version 1.2.25.17.00RA\n"); /*1.0 version 21 week 18 day*/
     vga->setTextColor(YELLOW, BLACK);
     if ( video_mode < MODE_TEXT_80_S){
         vga->printString("Copyright (C) 2026 pdsilva(aka pgordao).\nV1.2 Vpico2vga312k\n");

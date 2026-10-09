@@ -136,6 +136,39 @@ extern void duart_a_init_38400(void);
 extern void history_add(const char *cmd);
 extern void readline_with_history(char *buf);
 
+void jump_to_kernel(void)
+{
+    m68k_disable_all_interrupts();
+    asm volatile(
+        "jmp 0x82000\n"
+    );
+}
+
+#define KERNEL_LOAD_ADDR ((void *) 0x82000)
+
+int load_kernel_flat(const char *path)
+{
+    FIL fil;
+    FRESULT fr;
+    UINT br;
+
+    fr = f_open(&fil, path, FA_READ);
+    if (fr != FR_OK) {
+        printf("kernel: falha ao abrir kernel.bin\n");
+        return 0;
+    }
+
+    fr = f_read(&fil, KERNEL_LOAD_ADDR, f_size(&fil), &br);
+    f_close(&fil);
+
+    if (fr != FR_OK || br == 0) {
+        printf("kernel: falha ao ler kernel.bin\n");
+        return 0;
+    }
+
+    return 1;
+}
+
 void main() {
     pico_write_ch('A');
     set_console_output(picovga_putchar);
@@ -190,10 +223,36 @@ void main() {
     pico_write_ch('L');
 
     ring_buf_init();
+
+    uint32_t timeout = systemTick;
+    timeout += 5000;
+    char ch = 0;
+    printf("Pressione DELETE to go offline system!\n");
+    while( systemTick < timeout ){
+        if( ! ring_buf_is_empty() ){
+            ch = ring_buf_get_char();
+            break;
+        } 
+    }
+    if(ch == 0x7f){
+        printf("User wants do bypass Offline State\n");
+        //LOAD SHELL.
+        goto SHELL;
+    }else{
+        printf("Loading oKernel\n");
+        if (load_kernel_flat("kernel.sys")) {
+            jump_to_kernel();
+        } else {
+            printf("No kernel, loading oshell\n");
+        }        
+    }
+
+SHELL:
+
     //********************************************************
     //T H I S   M U S T   B E   T H E  L A S T    T H I N G 
     display_prompt();
-    pico_write_ch('L');
+    pico_write_ch('M');
     while (1){
         readline_with_history(g_cmd_buffer);
         history_add(g_cmd_buffer); 

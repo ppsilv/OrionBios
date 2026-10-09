@@ -26,6 +26,6 @@
 #define SYS_FILELIST    19
 #define SYS_FFINDFIRST  22
 #define SYS_FFINDNEXT   23
-
+#define SYS_FGETCWD     24
 #endif
 

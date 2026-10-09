@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <errno.h>
 #include <trap12.h>
 #include "fatfs/ff.h"
 
@@ -119,7 +120,19 @@ FRESULT flseek(FIL* fp, FSIZE_t offset) {
     __asm__ volatile ("trap #12" : "=r"(res) : "r"(cmd), "r"(arg_a0), "r"(arg_d0) : "memory");
     return (FRESULT)res;
 }
+uint32_t fseek(FIL *fp, long offset, int whence)
+{
+    register uint32_t d0_io  __asm__("d0") = (uint32_t)offset;   /* entra: offset / sai: resultado */
+    register uint32_t cmd    __asm__("d1") = SYS_FLSEEK;
+    register uint32_t arg_d2 __asm__("d2") = (uint32_t)whence;
+    register void    *arg_a0 __asm__("a0") = (void *)fp;
 
+    __asm__ volatile ("trap #12"
+                      : "+r"(d0_io)
+                      : "r"(cmd), "r"(arg_d2), "r"(arg_a0)
+                      : "memory", "cc");
+    return d0_io;
+}
 /* =========================================================================
  * 2. Posição, Tamanho e Status
  * ========================================================================= */
@@ -263,6 +276,20 @@ FRESULT findnext(DIR* dp, FILINFO* fno) {
     register uint32_t cmd    __asm__("d1") = SYS_FFINDNEXT;
     register void*    arg_a0 __asm__("a0") = (void*)dp;
     register void*    arg_a1 __asm__("a1") = (void*)fno;
+
+    __asm__ volatile ("trap #12" : "=r"(res) : "r"(cmd), "r"(arg_a0), "r"(arg_a1) : "memory");
+    return (FRESULT)res;
+}
+
+FRESULT fgetcwd(char *buf, size_t size)
+{
+    if (!buf || size == 0) { 
+        return FR_INVALID_PARAMETER; 
+    }
+    register uint32_t res    __asm__("d0");
+    register uint32_t cmd    __asm__("d1") = SYS_FGETCWD;
+    register void*    arg_a0 __asm__("a0") = (void*)buf;
+    register void*    arg_a1 __asm__("a1") = (void*)size;
 
     __asm__ volatile ("trap #12" : "=r"(res) : "r"(cmd), "r"(arg_a0), "r"(arg_a1) : "memory");
     return (FRESULT)res;

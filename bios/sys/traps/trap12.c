@@ -28,8 +28,31 @@ void do_sync(int argc, char *argv[]) {
     f_sync((FIL *)argv[0]);
 }
 
-int do_lseek(int argc, char *argv[]) {
+int do_flseek(int argc, char *argv[]) {
     return f_lseek((FIL *)argv[0], (FSIZE_t)argv[1]);
+}
+
+uint32_t do_lseek(int argc, uint32_t *argv)
+{
+    FIL  *fp     = (FIL *)argv[0];
+    long  off    = (long)argv[1];
+    int   whence = (int)argv[2];
+    long  base, target;
+
+    if (argc < 3 || !fp) return (uint32_t)-1;
+
+    switch (whence) {
+    case 0:  base = 0;                break;   /* SEEK_SET */
+    case 1:  base = (long)f_tell(fp); break;   /* SEEK_CUR */
+    case 2:  base = (long)f_size(fp); break;   /* SEEK_END */
+    default: return (uint32_t)-1;
+    }
+
+    target = base + off;
+    if (target < 0) return (uint32_t)-1;
+
+    if (f_lseek(fp, (FSIZE_t)target) != FR_OK) return (uint32_t)-1;
+    return (uint32_t)f_tell(fp);
 }
 
 FSIZE_t do_tell(int argc, char *argv[]) {

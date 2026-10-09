@@ -17,13 +17,15 @@ typedef struct
 #define     FONTE_8X12      0x0A
 #define     FONTE_8X14      0x0B
 #define     FONTE_8X16      0x0C
+#define     FONTE_8X16_2    0x0E
 #define     FONTE_8X18      0x0D
 
 extern font_t * set_font(uint8_t fonte);
 
 extern const uint8_t font_8x12[16 * 128];
 extern const unsigned char font_8x14[16 * 128];
-extern const unsigned char font_8x16[16*130];
+extern const unsigned char font_8x16[16 * 130];
+extern const unsigned char font_8x16_2[16 * 130];
 extern const unsigned char font_8x18[32 * 128];
 
 #endif

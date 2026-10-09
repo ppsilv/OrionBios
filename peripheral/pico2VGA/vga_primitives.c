@@ -231,7 +231,7 @@ static void drawChar2( vga_text_private_t* priv,int start_x, int start_y, uint8_
     // PRIMEIRO: Limpa a área completa do caractere
     fillRect(start_x, start_y, charWidth, charHeight, bgcolor);
 
-    const uint8_t *char_start = font_8x16 + (char_code * priv->font.height);
+    const uint8_t *char_start = priv->font.data + (char_code * priv->font.height);
     // Percorrer todas as linhas (bytes) do caractere
     for (int row = 0; row < priv->font.height; row++) {
         uint8_t current_byte = char_start[row];
@@ -486,6 +486,18 @@ static void setTextColorBig(color_t color, char background) {
   priv->textbgcolor = background;
 }
 
+static void setTextFont(font_t *font) {
+  vga_text_private_t* priv = (vga_text_private_t*)vga->_private;
+
+  priv->font.name = font->name;
+  priv->font.width = font->width ;
+  priv->font.height= font->height ;
+  priv->font.size = font->size ;   
+  priv->font.data = font->data ;
+
+
+}
+
 short readPixel(short x, short y) {
   vga_text_private_t* priv = (vga_text_private_t*)vga->_private;
   int pixel = ((640 * y) + x) ;
@@ -529,7 +541,7 @@ vga_t* create_screen(screenMode_t mode){ //,uint8_t active_buffer1[],uint32_t tx
       return NULL;
   }
   memcpy_dma_chan = dma_claim_unused_channel(true);
-  font = set_font(FONTE_8X16);
+  font = set_font(FONTE_8X16_2);
     // Initialize the VGA screen
   initVGA(  &active_buffer, TXCOUNT , mode) ;
 
@@ -548,7 +560,7 @@ vga_t* create_screen(screenMode_t mode){ //,uint8_t active_buffer1[],uint32_t tx
   priv->font.width = font->width ;
   priv->font.height= font->height ;
   priv->font.size = font->size ;   
-  priv->font.data = font->name ;
+  priv->font.data = font->data ;
   priv->tabspace = 4;
   priv->txcount = TXCOUNT ;
   priv->topmask = 0b00001111 ;

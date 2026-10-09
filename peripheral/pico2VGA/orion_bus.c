@@ -40,6 +40,8 @@ volatile uint16_t delta;
 
 static char buf[256]={0};
 
+extern void setTextFont(font_t *font);
+
 // Converte 1 byte em 2 caracteres HEX
 static inline void u8_to_hex(uint8_t val, char *buf) {
     static const char hex[] = "0123456789ABCDEF";
@@ -120,6 +122,12 @@ void __not_in_flash_func(gerenciar_barramento_m68k)(PIO pio, uint sm){
                 case D_REG_DELTA:
                         delta = dado_m68k;
                         break; 
+                case D_REG_SETFONT:
+                    font_t *font = set_font(dado_m68k);
+                    setTextFont(font);
+                    vga->clrscr();
+                    break;    
+
                 case D_RUN_CMD:
                     switch(dado_m68k){
                         case CMD_SET_CUR_POS:

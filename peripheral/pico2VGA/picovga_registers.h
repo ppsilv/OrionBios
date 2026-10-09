@@ -33,7 +33,7 @@
 #define D_SET_HORIZONTAL        0x1C    //livre  
 #define D_SET_VERTICAL          0x1D    //livre
 #define D_RUN_CMD               0x1E
-#define D_CORINGA               0x1F    //livre
+#define D_REG_SETFONT           0x1F    
 
 
 
@@ -65,3 +65,6 @@
 #define CMD_DRAW_MULTILINE              0xB4
 
 #endif
+
+
+

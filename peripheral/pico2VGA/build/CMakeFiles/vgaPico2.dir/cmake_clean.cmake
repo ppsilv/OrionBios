@@ -11,6 +11,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/vgaPico2.dir/font_8x14.c.o.d"
   "CMakeFiles/vgaPico2.dir/font_8x16.c.o"
   "CMakeFiles/vgaPico2.dir/font_8x16.c.o.d"
+  "CMakeFiles/vgaPico2.dir/font_8x16_2.c.o"
+  "CMakeFiles/vgaPico2.dir/font_8x16_2.c.o.d"
   "CMakeFiles/vgaPico2.dir/font_8x18.c.o"
   "CMakeFiles/vgaPico2.dir/font_8x18.c.o.d"
   "CMakeFiles/vgaPico2.dir/home/pdsilva/.pico-sdk/sdk/2.2.0/lib/tinyusb/src/class/audio/audio_device.c.o"

@@ -133,7 +133,7 @@ file_sync:
  * 5. FILE LSEEK: f_lseek(fp, offset) -> 2 argumentos
  * Regs: A0 = fp, D0 = offset
  * ========================================================================= */
-file_lseek:
+file_flseek:
     move.l  %d0,-(%sp)          /* argv[1] = offset */
     move.l  %a0,-(%sp)          /* argv[0] = fp */
     
@@ -142,9 +142,24 @@ file_lseek:
     move.l  %a2,-(%sp)          /* 2º param: argv */
     move.l  #2,-(%sp)           /* 1º param: argc = 2 */
 
-    jsr     do_lseek
+    jsr     do_flseek
 
     lea     16(%sp),%sp         /* Limpa 4 longs (16 bytes) */
+    bra     trapC_exit
+
+file_lseek:
+    move.l  %d2,-(%sp)          /* argv[2] = whence */
+    move.l  %d0,-(%sp)          /* argv[1] = offset */
+    move.l  %a0,-(%sp)          /* argv[0] = fp */
+
+    move.l  %sp,%a2             /* A2 = &argv[0] */
+
+    move.l  %a2,-(%sp)          /* 2º param: argv */
+    move.l  #3,-(%sp)           /* 1º param: argc = 3 */
+
+    jsr     do_lseek
+
+    lea     20(%sp),%sp         /* 5 longs (3 do argv + argc + ponteiro) */
     bra     trapC_exit
 
 /* =========================================================================

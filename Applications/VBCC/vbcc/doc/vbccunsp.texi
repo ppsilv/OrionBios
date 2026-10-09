@@ -1,0 +1,46 @@
+This chapter documents the backend for the Sunplus/GeneralPlus µn'SP processor family.
+
+@section ABI
+
+    The current version generates assembler output for use with Mike Kohn's naken_asm.
+    This assembler does not emit intermediate object files, and there is no linker.
+
+    The register names provided by this backend are:
+
+@example
+    SP, R1, R2, R3, R4, BP, SR, PC
+@end example
+
+    @code{R1} to @code{R4} are general purpose registers. SP is the stack pointer. PC is the code
+    pointer and BP is the frame pointer. Normally only the four general purpose registers will be
+    used by the generated code.
+
+    All registers are 16 bit, the R3 and R4 registers are used as inputs and output (as a single 32
+    bit value for the multiplication instruction.
+
+    All basic data types (char, short, int, long and long long) are 16 bit wide.
+
+    Functions return values are stored in R1.
+
+    Functions save and restore all registers in the callee. Parameters are passed on the stack
+    and removed from the stack by the caller.
+
+@section Math
+
+    The only math routines are @code{__mod} and @code{__div} for 32 bit by 16 bit division.
+
+@section Segmented addresses
+
+    Currently segmented addresses and "far calls" are not supported. All addresses are 16 bit.
+    Relative jumps will allow to call code in the neighboring blocks. The data segment address
+    is never changed.
+
+@section Known problems
+
+@itemize @minus
+    @item Types larger than 16 bit are not supported
+    @item There is no assembler with a linker, so only compilation can be done
+    @item Larger memory models with data and code segment registers usage not available yet
+    @item Pre and post increment addressing modes are not used
+    @item Some operations and addressing modes are not generated properly
+@end itemize

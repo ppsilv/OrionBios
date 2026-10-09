@@ -1,0 +1,486 @@
+This chapter documents the backend for the 65816
+processor family.
+
+@section Additional options
+
+This backend provides the following additional options:
+
+@table @option
+
+    @item -mtiny
+		Use tiny memory model. All data pointers are near-pointers
+		unless otherwise specified.
+
+    @item -mhuge
+                Use huge memory model. All data pointers are huge-pointers
+                unless otherwise specified.
+
+    @item -ptr24
+		All far- and huge-pointers are 24 bits wide unless otherwise
+		specified.
+
+    @item -near-threshold=<size>
+                Set the threshold for automatic near placement to <size> bytes.
+
+    @item -no-near-const
+                Do not automatically place constant data into near section.
+                Explicit use of __near specifier is still possible.
+
+    @item -std-syntax
+              Generate code for the std syntax module of vasm rather than
+              the default oldstyle syntax module.
+
+    @item -const-in-data
+              Put constant data in data section rather than rodata.
+
+    @item -cbmascii
+              Convert string-constants and character-constants to CBM ASCII.
+
+    @item -atascii
+              Convert string-constants and character-constants to Atari ASCII.
+
+    @item -iigs
+              Put near data in zpage section. Used for small memory model
+              on Apple IIgs.
+
+    @item -msfp4
+              Use MSBasic 32bit format for floating point rather than wozfp format.
+
+    @item -ieee
+              Use 32/64bit IEEE format for floating point rather than wozfp format.
+
+    @item -snes-muldiv
+              Perform integer multiplication (division not yet implemented)
+              with library functions that make use of the 5A22 hardware
+              multiplier. Those routines are significantly faster but they
+              are not re-entrant., i.e. you must make sure that e.g. an
+              interrupt handler does not use multiplication or division if
+              the main code does so as well.
+
+    @item -no-delayed-popping
+              By default arguments of function calls are not always popped
+              from the stack immediately after the call, so that the
+              arguments of several calls may be popped at once.
+              With this option @command{vbcc} can be forced to pop them after every
+              function call.
+              This may simplify debugging and reduce the
+              stack size needed by the compiled program.
+
+    @item -glob-acc
+              By default, the register allocator will only assign temporary
+              variables to the accumulator register or @code{a/x} register pair.
+              Usually this reduces necessary storing/loading of the accumulator
+              as it is needed during most operations. This option allows the
+              register allocator to assign variables with bigger live ranges to
+              the accumulator. This option is likely to create worse code in
+              most cases. Use only for experimentation.
+
+    @item -sc
+		Use jsr/rts for function calls. Code size is more or less
+		limited to 64K. Code using this option will be incomaptible
+		with libraries that have been compiled without it.
+
+		This option is not yet fully implemented.
+
+@end table
+
+@section ABI
+
+    The current version generates assembler output for use with 
+    @command{vasm6502_oldstyle} or  @command{vasm6502_std}. 
+    The option @command{-opt-branch} is needed.
+
+    The register names provided by this backend are:
+
+@example
+        a, x, y, r0..r31, btmp0..btmp3
+@end example
+
+        @code{a} is the accumulator. It can be used for type @code{char},
+	@code{short} and @code{int}.
+
+        @code{x} can be used for @code{char}, @code{short}, @code{int} and
+	near-pointers.
+
+        @code{y} is reserved for the code generator.
+
+        @code{r0} ... @code{r31} are 16bit variables that can be used for type
+        @code{char}, @code{short}, @code{int} and near-pointers. They have to be mapped
+        to direct-page during linking. The compiler expects registers that can
+        be used as register pairs (see below) to be mapped to contiguous
+        memory locations. Some library routines may have additional requirements.
+
+        @code{btmp0}..@code{btmp3} are 32bit variables that have to be mapped
+	to direct-page.
+
+        The following register pairs can also be used for
+        24/32bit values.
+
+@example
+        a/x, r0/r1, r2/r3 ... r30/r31
+@end example
+
+        The following register pairs can be used for
+        64bit values (IEEE doubles or long long).
+
+@example
+        btmp0/btmp1, btmp2/btmp3
+@end example
+
+
+       Registers @code{a, x, r0..r15, r28..r31, btmp0..btmp3} are volatile
+       (i.e. they can be destroyed in function calls). @code{r16..r27} are
+       preserved across function calls.
+
+       The first 8/16/32bit argument is passed in the accumulator (a and x
+       in the case of 32bit).
+       All other types are passed on the stack.
+
+       For functions with a variable-argument-list, arguments that are part
+       of the variable-argument-list are always passed on the stack. It is
+       therefore required that a prototype is in scope when calling such functions
+       (as required by C).
+
+       Scalar types are returned as follows:
+@example
+    type        registers
+
+    char        a
+    short       a
+    int         a
+    long        a/x
+    long long   n/a
+    near-ptrs   a
+    far-ptrs    a/x
+    float       a/x
+    double      a/x or btmp0/btmp1 (IEEE)
+    long double a/x or btmp0/btmp1 (IEEE)
+@end example
+
+       All other types are returned by passing the function the address
+       of the result as a hidden argument - such a function must not be called
+       without a proper declaration in scope.
+
+The basic data types are represented like this:
+
+@example
+    type        size in bits        alignment in bytes
+
+    char                8                       1
+    short              16                       1
+    int                16                       1
+    long               32                       1
+    long long          64                       1       (currently not supported)
+    near pointers      16                       1
+    far pointers       32                       1
+    far3 pointers      24                       1
+    huge pointers      32                       1
+    huge3 pointers     24                       1
+    float              32                       1       see below
+    double             32/64                    1       see below
+    long double        32/64                    1       see below
+@end example
+
+
+@section Math
+
+
+    For certain operations @code{vbcc} will emit calls to routines that have
+    to be provided by a library.
+    For integer code, the following operations are handled by library routines
+    (some special cases involving constants may be handled by inline code).
+
+@example
+     __mulint16                 16x16=>16 multiplication
+     __mulint32                 32x32=>32 multiplication
+     __divint16                 16x16=>16 signed division
+     __divint32                 32x32=>32 signed division
+     __divuint16                16x16=>16 unsigned division
+     __divuint32                32x32=>32 unsigned division
+     __modint16                 16x16=>16 signed modulo
+     __modint32                 32x32=>32 signed modulo
+     __moduint16                16x16=>16 unsigned modulo
+     __moduint32                32x32=>32 unsigned modulo
+@end example
+
+@subsection Floating Point / wozfp
+
+    By default, all floating point types are implemented as 32bit values
+    using the format used by the floating point routines published by Roy Rankin
+    and Steve Wozniak. While this does work for many use cases, it
+    is not fully C compliant by any means. Calculation of constants in the
+    compiler is not done in that format. Therefore, the results of
+    calculations done at compile-time may be different from those at run-time.
+    The corresponding math library must be linked using @code{-lm/-lms}.
+
+    These routines are very compact, but they are very slow. They
+    should probably only be used when saving memory is the top priority.
+
+@subsection Floating Point / MSBASIC
+
+    The second, usually preferable, alternative is based on the math
+    routines from 6502 Microsoft Basic (which has been released under
+    MIT license - see below). These routines have been adapted
+    to work with vbcc65816. They deliver much better performance than the
+    wozfp code and are usually somewhat more precise. Currently only
+    the 32bit version of those routines is supported (the 40bit version
+    is not).
+    You have to specify @code{-msfp4} and link the corresponding math library
+    using @code{-lms4/-lms4h/-lms4s}.
+
+
+     License from the release of MSBasic:
+@example
+MIT License 
+
+    Copyright (c) Microsoft Corporation.
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE
+@end example
+
+@subsection Floating Point / IEEE
+
+    Not yet supported.
+
+
+
+@section Target-Specific Variable Attributes
+
+    This backend offers the following variable attributes:
+
+@table @code
+    @item __interrupt
+          Used for writing interrupt handlers. All modified register will be
+          restored. Note that that may include all volatile zpage registers
+          in the case of function calls within the interrupt handler.
+
+    @item __zpage
+              Place variable in section @code{zpage} and instruct @code{vbcc}
+              to use it with direct-page addressing.
+
+@end table
+
+@section Target-Specific Type Attributes
+
+    This backend offers the following type attributes:
+
+@table @code
+	@item __near
+		The object is addressed via the bank-register.
+		Pointers to near-objects will be 16 bits wide.
+
+        @item __far
+                Such objects are addressed via full 24bit addressing. Arithmetic
+		will be done with 16bit only, i.e. objects must not cross
+		a bank-boundary. A pointer to a far-object will be 32 bits wide.
+
+        @item __huge
+                The object is addressed via full 24bit addressing. Arithmetic
+                will be done with 32bits. A pointer to a far-object will be
+		32 bits wide.
+
+        @item __far3
+		Same as __far, however pointers will be 24 bits wide. 24bit
+                pointers occupy 3 bytes in memory instead of 4 bytes (there
+		is no difference for pointers kept in registers). However,
+		the code generated for accessing 24bit pointers is usually
+		less efficient, because the CPU mode may have to be switched
+		to access the upper 8bits. vbcc will try to avoid those
+		mode-switches, but this is only possible in certain cases.
+
+        @item __huge3
+                Same as __huge, however pointers will be 24 bits wide. See above
+		for details.
+
+        @item __pascal
+                Only for functions. Use calling conventions similar to pascal.
+                All arguments are passed on the stack, and it is assumed that
+                the callee removes the arguments from the stack and pushes
+                the return value on the stack. The attribute is only effective
+                when calling a function. It cannot be used to change the ABI
+                of a function written in C.
+
+                This attribute can help calling GSOS/ToolBox functions on Apple IIgs.
+                However, it is only a partial implementation of that ABI.
+                Arguments are still pushed in C order (last argument first)
+                and vbcc does not make room on the stack for the return value.
+                Therefore, some additional glue code will usually be needed,
+                e.g.
+
+@example
+extern pascal Handle __NewHandle () inline(0x0902,dispatcher);
+#define NewHandle(a,b,c,d) __NewHandle((d),(c),(b),(a),0l)
+@end example
+
+@end table
+
+
+
+@section Target-Specific #pragmas
+
+    This backend offers the following #pragmas
+
+@table @code
+    @item #pragma section <sec>
+              The following functions and variables are placed in section <sec>.
+
+    @item #pragma section default
+              The following functions and variables are placed in default sections.
+
+@end table
+
+
+@section Predefined Macros
+
+        This backend defines the following macros:
+
+@table @code
+        @item __65816__
+
+        @item __MTINY          (tiny model)
+        @item __MLARGE         (large model)
+        @item __MHUGE          (huge model)
+        @item __SIZE_T_INT     (tiny and large model)
+        @item __SIZE_T_LONG    (huge model)
+	@item __WOZFP__        (wozfp floating point)
+	@item __MSFP4__	       (32bit MSBasic floating point)
+
+@end table
+
+
+@section Memory models
+
+This backend supports different memory models, based on the 65816 architecture.
+
+@subsection Pointer Types
+
+Several types of pointers are supported. See the type qualifier list for
+details. When pointer types are not
+explicitly specified using type qualifiers, the default
+pointer types depend on command line options like
+@code{-mtiny},
+@code{-mhuge}, or @code{-ptr24}. Function- and data-pointers can have
+different default types.
+
+It is also possible to use non-default memory types by explicitly
+specifying type qualifiers (e.g. using far-data in the small data model).
+But keep in mind that such objects might not be correctly addressable by
+the default pointer type. When using pointers to such objects you may
+have to explicitly specify the pointer type.
+
+@subsection Small Code
+This model is activated by the @code{-sc} option. It is not yet implemented.
+Function pointers will be 16 bits wide and return addresses will occupy
+2 bytes on the stack.
+
+@subsection Large Code
+This model is active by default. Code can be located anywhere in the 16MB
+address range. Function pointers will be 24 or 32 bits wide and return
+addresses will occupy 3 bytes on the stack.
+
+Note however that due to limitations of the 65816 CPU, functions must not
+cross a 64KB bank boundary.
+
+@subsection Small Data
+This model is used with @code{-mtiny}. Data will be addressed using 16bit offsets
+to the data-bank register. Data pointers will be 16 bits wide. This model
+usually creates smaller and faster code, but data is limited to 64KB and
+the stack must be in the same bank as the near data. @code{size_t} is unsigned int.
+
+@subsection Large Data
+This model is used by default. Data will be addressed using
+full 24bit addresses. Data pointers will either be 24 bits wide (if @code{-ptr24}
+is specified) or 32 bits wide. However, when performing address arithmetic,
+only the lower 16 bits will be used. As a result, objects can be located
+anywhere in the 16MB address space, but they must not cross a bank boundary.
+@code{size_t} is unsigned int.
+
+@subsection Huge Data
+This model is used with @code{-mlarge}. Data will be addressed using
+full 24bit addresses. Data pointers will either be 24 bits wide (if @code{-ptr24}
+is specified) or 32 bits wide. Address arithmetic is performed on the full
+address. As a result, there is no restriction on placement and size of
+objects (apart from the 16MB limit). @code{size_t} is unsigned long.
+Take care to use prototypes or correct argument types when calling functions
+using a @code{size_t} parameter.
+
+@subsection Automatic near
+By default, static objects less or equal to 8 bytes will be put into the near
+section, allowing slightly more efficient code. The address of such an object
+will be a normal pointer (i.e. far-pointer in far model and huge-pointer in
+huge model). This is different from an object explicitly specified using the
+__near attribute and therefore transparent to the program.
+
+The threshold of 8 bytes can be changed using the @code{-near-threshold}
+option. @code{-near-threshold=0} will disable the feature.
+
+When using @option{-no-near-const} option, the feature is disabled for
+read-only objects.
+
+@section 8Bit Mode
+The code generated by vbcc assumes that the accumulator and index registers
+are running in 16bit mode. When 8bit data has to be accessed, vbcc will
+temporarily switch to 8bit mode and back again (usually only the accumulator
+is switched and the index registers are kept at 16bit).
+
+Some optimizations are performed to reduce the necessary mode-switching. If
+an operation can be performed in 16bit mode, there will usually be no mode
+switch. Also, if several consecutive 8bit operations are performed, vbcc will
+try to stay in 8bit mode as long as possible. However, these optimizations
+are limited and usually only performed locally, i.e. the code will never stay
+in 8bit mode across jumps etc.
+
+Therefore it can be beneficial to adapt the source code accordingly. Usually
+try to limit the ue of 8bit operations. Where necessary, try to group 8bit
+operations.
+
+
+@section Debugging
+
+    The 6502 backend has some limited support for debugging.
+
+    When using vlink, the @code{-vicelabels} options can be used to output symbol
+    values in a format that can be read by the vice emulator/debugger. vlink
+    also offers @code{-symfile} and @code{-symfmt} options to configure the
+    format of the symbol file.
+
+     With the @code{-g} option, line numbers and file names of source code will
+    be added to the assembly output. Using some tools, it should be possible to
+    create a mixed C/assembly file for inspection.
+    Depending on the optimization level, the
+    results may be more or less usable, see section Debugging Optimized Code.
+    Note that the added comments will affect the assembly peephole
+    optimizer, resulting in worse code than without @code{-g}.
+    
+
+@section Code compressor
+
+  Not yet implemented.
+
+@section Known problems
+
+@itemize @minus
+    @item @code{long long} not yet supported
+
+    @item ...
+
+@end itemize
+
+
+
